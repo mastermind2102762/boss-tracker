@@ -349,7 +349,7 @@ function toggleNotif(id){
   const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
   // FP кнопки не имеют id — перерендерим арену
-  if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_'))renderArena();
+  if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_')||id.startsWith('dm_')||id.startsWith('qn_'))renderArena();
 }
 
 const MEMBERS=[
@@ -434,6 +434,8 @@ function renderArena(){
     const isFP=b.name==='Fortune Pouch';
     const isSoldier=b.name==='Soldier';
     const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
+    const isDoom=b.name==='Doomed Knight';
+    const isQueen=b.name==='Queen of the Damned';
     const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     const bl=getBS(bid+'_bl',b.blessMin);
@@ -442,7 +444,9 @@ function renderArena(){
     const blClick=b.blessMin!==null&&b.blessMin>=0?`onclick="toggleArena('${bid}_bl',${b.blessMin})"`:'' ;
     const blNotif=isFP?`<button class="notif-btn ${getNotif('fp_bl')?'on':'off'}" onclick="toggleNotif('fp_bl')" title="Sound alert">&#9836;</button>`:
                   isSoldier?`<button class="notif-btn ${getNotif('sl_bl')?'on':'off'}" onclick="toggleNotif('sl_bl')" title="Sound alert">&#9836;</button>`:
-                  isBali?`<button class="notif-btn ${getNotif(bk+'bl')?'on':'off'}" onclick="toggleNotif('${bk}bl')" title="Sound alert">&#9836;</button>`:'';
+                  isBali?`<button class="notif-btn ${getNotif(bk+'bl')?'on':'off'}" onclick="toggleNotif('${bk}bl')" title="Sound alert">&#9836;</button>`:
+                  isDoom?`<button class="notif-btn ${getNotif('dm_bl')?'on':'off'}" onclick="toggleNotif('dm_bl')" title="Sound alert">&#9836;</button>`:
+                  isQueen?`<button class="notif-btn ${getNotif('qn_bl')?'on':'off'}" onclick="toggleNotif('qn_bl')" title="Sound alert">&#9836;</button>`:'';
     // VIP cols
     const vipCols=['main','sub1','sub2'].map(loc=>{
       if(b.vipMin===null)return`<td class="acell"><div class="atimer none">—</div></td>`;
@@ -452,7 +456,9 @@ function renderArena(){
       const cls=vs.status==='idle'?'':vs.status;
       const cellNotif=isFP?`<button class="notif-btn ${getNotif('fp_'+loc)?'on':'off'}" onclick="toggleNotif('fp_${loc}')" title="Sound alert">&#9836;</button>`:
                       isSoldier?`<button class="notif-btn ${getNotif('sl_'+loc)?'on':'off'}" onclick="toggleNotif('sl_${loc}')" title="Sound alert">&#9836;</button>`:
-                      isBali?`<button class="notif-btn ${getNotif(bk+loc)?'on':'off'}" onclick="toggleNotif('${bk}${loc}')" title="Sound alert">&#9836;</button>`:'';
+                      isBali?`<button class="notif-btn ${getNotif(bk+loc)?'on':'off'}" onclick="toggleNotif('${bk}${loc}')" title="Sound alert">&#9836;</button>`:
+                      isDoom?`<button class="notif-btn ${getNotif('dm_'+loc)?'on':'off'}" onclick="toggleNotif('dm_${loc}')" title="Sound alert">&#9836;</button>`:
+                      isQueen?`<button class="notif-btn ${getNotif('qn_'+loc)?'on':'off'}" onclick="toggleNotif('qn_${loc}')" title="Sound alert">&#9836;</button>`:'';
       return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${cellNotif}</td>`;
     }).join('');
     return`<tr>
@@ -493,6 +499,10 @@ const soldierAlertFired={bl:false,main:false,sub1:false,sub2:false};
 const SOLDIER_SOUNDS={bl:'basoldier.mp3',main:'mainsoldier.mp3',sub1:'s1soldier.mp3',sub2:'s2soldier.mp3'};
 const baliAlertFired={b1_bl:false,b1_main:false,b1_sub1:false,b1_sub2:false,b2_bl:false,b2_main:false,b2_sub1:false,b2_sub2:false,b3_bl:false,b3_main:false,b3_sub1:false,b3_sub2:false};
 const BALI_SOUNDS={bl:'babali.mp3',main:'mainbali.mp3',sub1:'s1bali.mp3',sub2:'s2bali.mp3'};
+const doomAlertFired={bl:false,main:false,sub1:false,sub2:false};
+const DOOM_SOUNDS={bl:'doomba.mp3',main:'doommain.mp3',sub1:'dooms1.mp3',sub2:'dooms2.mp3'};
+const queenAlertFired={bl:false,main:false,sub1:false,sub2:false};
+const QUEEN_SOUNDS={bl:'queenba.mp3',main:'queenmain.mp3',sub1:'queens1.mp3',sub2:'queens2.mp3'};
 
 function tickArena(){
   ARENA_BOSSES.forEach(b=>{
@@ -500,6 +510,8 @@ function tickArena(){
     const isFP=b.name==='Fortune Pouch';
     const isSoldier=b.name==='Soldier';
     const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
+    const isDoom=b.name==='Doomed Knight';
+    const isQueen=b.name==='Queen of the Damned';
     const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     if(b.blessMin!==null){
@@ -520,6 +532,14 @@ function tickArena(){
         const ak=bk+'bl';
         if(s.left<=60000&&s.left>0&&getNotif(ak)){if(!baliAlertFired[ak]){baliAlertFired[ak]=true;playAlert(BALI_SOUNDS.bl);}}
         else if(s.left>60000){baliAlertFired[ak]=false;}
+      }
+      if(isDoom&&s.status==='active'){
+        if(s.left<=180000&&s.left>0&&getNotif('dm_bl')){if(!doomAlertFired.bl){doomAlertFired.bl=true;playAlert(DOOM_SOUNDS.bl);}}
+        else if(s.left>180000){doomAlertFired.bl=false;}
+      }
+      if(isQueen&&s.status==='active'){
+        if(s.left<=180000&&s.left>0&&getNotif('qn_bl')){if(!queenAlertFired.bl){queenAlertFired.bl=true;playAlert(QUEEN_SOUNDS.bl);}}
+        else if(s.left>180000){queenAlertFired.bl=false;}
       }
     }
     // VIP
@@ -542,6 +562,14 @@ function tickArena(){
           const ak=bk+loc;
           if(s.left<=60000&&s.left>0&&getNotif(ak)){if(!baliAlertFired[ak]){baliAlertFired[ak]=true;playAlert(BALI_SOUNDS[loc]);}}
           else if(s.left>60000){baliAlertFired[ak]=false;}
+        }
+        if(isDoom&&s.status==='active'){
+          if(s.left<=180000&&s.left>0&&getNotif('dm_'+loc)){if(!doomAlertFired[loc]){doomAlertFired[loc]=true;playAlert(DOOM_SOUNDS[loc]);}}
+          else if(s.left>180000){doomAlertFired[loc]=false;}
+        }
+        if(isQueen&&s.status==='active'){
+          if(s.left<=180000&&s.left>0&&getNotif('qn_'+loc)){if(!queenAlertFired[loc]){queenAlertFired[loc]=true;playAlert(QUEEN_SOUNDS[loc]);}}
+          else if(s.left>180000){queenAlertFired[loc]=false;}
         }
       });
     }
