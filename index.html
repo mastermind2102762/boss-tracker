@@ -386,6 +386,7 @@ function toggleNotif(id){
   if(b){b.className='notif-btn '+(on?'off':'on');}
   // FP кнопки не имеют id — перерендерим арену
   if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_')||id.startsWith('dm_')||id.startsWith('qn_'))renderArena();
+  if(id.startsWith('boss_'))renderBosses();
 }
 
 const MEMBERS=[
@@ -439,7 +440,7 @@ function renderEvents(){
   document.getElementById('eventList').innerHTML=EVENTS.map(ev=>{
     const{msLeft,isOpen,isAlive}=getNextEv(ev);
     const soon=msLeft<5*60000&&!isOpen;
-    const cls=isOpen?'open':soon?'soon':'';
+    const cls=isAlive?'open':isOpen?'open':soon?'soon':'';
     const txt=isAlive?(ev.aliveLabel||'ALIVE'):isOpen?'OPEN':fmt(msLeft);
     const hasAlert=ALERT_IDS.includes(ev.id);
     const on=hasAlert?getNotif(ev.id):false;
@@ -455,11 +456,16 @@ function renderBosses(){
       ${g.bosses.map(b=>{
         const{status,left}=getBS(b.id,b.min);
         const txt=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
+        const hasSound=!!BOSS_SOUNDS[b.id];
+        const notifBtn=hasSound?`<button class="notif-btn ${getNotif('boss_'+b.id)?'on':'off'}" onclick="event.stopPropagation();toggleNotif('boss_${b.id}')" title="Sound alert">&#9836;</button>`:'';
         return`<div class="bitem ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}',${b.min})">
           <div class="bitem-name">${b.name}</div>
-          <div style="text-align:right">
-            <div class="bitem-timer ${status==='idle'?'':status}" id="bt-${b.id}">${txt}</div>
-            <div class="bitem-sub">${fmtL(b.min)}</div>
+          <div style="text-align:right;display:flex;align-items:center;gap:6px;">
+            ${notifBtn}
+            <div>
+              <div class="bitem-timer ${status==='idle'?'':status}" id="bt-${b.id}">${txt}</div>
+              <div class="bitem-sub">${fmtL(b.min)}</div>
+            </div>
           </div>
         </div>`;
       }).join('')}
@@ -513,12 +519,23 @@ function tickEvents(){
     const el=document.getElementById('et-'+ev.id);if(!el)return;
     const soon=msLeft<5*60000&&!isOpen;
     el.textContent=isAlive?(ev.aliveLabel||'ALIVE'):isOpen?'OPEN':fmt(msLeft);
-    el.className='ev-timer'+(isOpen?' open':soon?' soon':'');
+    el.className='ev-timer'+(isAlive?' open':isOpen?' open':soon?' soon':'');
     if(ALERT_IDS.includes(ev.id)&&soon&&!isOpen&&getNotif(ev.id)){
       if(!alertFired[ev.id]){alertFired[ev.id]=true;playAlert(SOUND_MAP[ev.id]);}
     } else if(ALERT_IDS.includes(ev.id)&&!soon){alertFired[ev.id]=false;}
   });
 }
+
+const BOSS_SOUNDS={
+  'zt_main': 'zaikantmain.mp3',
+  'zt_sub1': 'zaikans1.mp3',
+  'zt_sub2': 'zaikans2.mp3',
+  'zl':      'zaikanlor.mp3',
+  'de':      'darkelf.mp3',
+  'ck':      'cursedk.mp3',
+};
+const bossAlertFired={};
+Object.keys(BOSS_SOUNDS).forEach(id=>bossAlertFired[id]=false);
 
 function tickBosses(){
   BOSS_GROUPS.forEach(g=>g.bosses.forEach(b=>{
@@ -528,6 +545,12 @@ function tickBosses(){
     el.textContent=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
     el.className='bitem-timer'+(status==='idle'?'':' '+status);
     card.className='bitem '+status;
+    // Звуковой алерт за 3 минуты
+    if(BOSS_SOUNDS[b.id]&&status==='active'){
+      if(left<=180000&&left>0&&getNotif('boss_'+b.id)){
+        if(!bossAlertFired[b.id]){bossAlertFired[b.id]=true;playAlert(BOSS_SOUNDS[b.id]);}
+      } else if(left>180000){bossAlertFired[b.id]=false;}
+    }
   }));
 }
 
