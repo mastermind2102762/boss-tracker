@@ -97,11 +97,15 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 </header>
 
 <div class="layout">
-  <!-- COL 1: Events -->
+  <!-- COL 1: Events + Fortress -->
   <div>
     <div class="panel">
       <div class="ptitle">Events</div>
       <div id="eventList"></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Fortress</div>
+      <div id="fortressList"></div>
     </div>
   </div>
 
@@ -265,7 +269,42 @@ function getBS(id,min){
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
-function getNotif(id){return localStorage.getItem(id+'_notif')!=='off';}
+const FORTRESS=[
+  {id:'kd_morning', name:'Kanturu Domination', sub:'Morning',  hour:14, minute:30},
+  {id:'lf',         name:'Lorencia Fortress',  sub:'',         hour:18, minute:0 },
+  {id:'df',         name:'Davias Fortress',    sub:'',         hour:19, minute:30},
+  {id:'kd_evening', name:'Kanturu Domination', sub:'Evening',  hour:21, minute:0 },
+];
+
+function getFortressMs(hour, minute){
+  const t=getSrv();
+  const now=t.getUTCHours()*3600+t.getUTCMinutes()*60+t.getUTCSeconds();
+  const target=hour*3600+minute*60;
+  let diff=target-now;
+  if(diff<=0)diff+=86400;
+  return diff*1000;
+}
+
+function renderFortress(){
+  document.getElementById('fortressList').innerHTML=FORTRESS.map(f=>{
+    const ms=getFortressMs(f.hour,f.minute);
+    const hh=String(f.hour).padStart(2,'0'),mm=String(f.minute).padStart(2,'0');
+    return`<div class="ev-item">
+      <div class="ev-name" style="flex:1">${f.name}${f.sub?' <span style="color:var(--muted);font-size:10px;letter-spacing:1px;">('+f.sub+')</span>':''}</div>
+      <div style="text-align:right">
+        <div class="ev-timer" id="ft-${f.id}">${fmt(ms)}</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;">${hh}:${mm}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tickFortress(){
+  FORTRESS.forEach(f=>{
+    const el=document.getElementById('ft-'+f.id);if(!el)return;
+    el.textContent=fmt(getFortressMs(f.hour,f.minute));
+  });
+}
 function toggleNotif(id){
   const on=getNotif(id);localStorage.setItem(id+'_notif',on?'off':'on');
   const b=document.getElementById(id+'-notif-btn');
@@ -482,8 +521,8 @@ function updateSrvTime(){
 
 async function init(){
   await loadState();
-  renderEvents();renderBosses();renderArena();renderLog();
-  setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();},1000);
+  renderEvents();renderBosses();renderArena();renderLog();renderFortress();
+  setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();},1000);
   setInterval(async()=>{await loadState();},15000);
 }
 updateSrvTime();init();
