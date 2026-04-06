@@ -102,14 +102,14 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
   <!-- COL 3: Arena table (Bless / Main / Sub1 / Sub2) -->
   <div>
     <div class="panel">
-      <div class="ptitle">Arena — Bless / Main / Sub1 / Sub2</div>
+      <div class="ptitle">Arena — Bless Arena / VIP15 Main / VIP15 Sub1 / VIP15 Sub2</div>
       <table class="arena-table">
         <thead><tr>
           <th class="name-col">Boss</th>
-          <th>Bless</th>
-          <th>Main</th>
-          <th>Sub1</th>
-          <th>Sub2</th>
+          <th>Bless Arena</th>
+          <th>VIP15 Main</th>
+          <th>VIP15 Sub1</th>
+          <th>VIP15 Sub2</th>
         </tr></thead>
         <tbody id="arenaTable"></tbody>
       </table>
@@ -152,44 +152,36 @@ const BOSS_GROUPS=[
   {name:'Dark Elf',bosses:[
     {id:'de',name:'Dark Elf',min:60},
   ]},
-  {name:'Illusion of Kundun',bosses:[
-    {id:'iok1',name:'IK 1',min:120},
-    {id:'iok2',name:'IK 2',min:300},
-    {id:'iok3',name:'IK 3',min:480},
-    {id:'iok4',name:'IK 4',min:480},
-    {id:'iok5',name:'IK 5',min:600},
-    {id:'iok6',name:'IK 6',min:780},
-  ]},
 ];
 
 // Arena bosses: blessMin=null означает нет в Bless, vipMin=null означает нет на VIP
 // fixed:true = фиксированный респаун в fixedHour:00 по серверу
 const ARENA_BOSSES=[
   {name:'Fortune Pouch',      blessMin:10,  vipMin:30 },
+  {name:'Soldier',            blessMin:30,  vipMin:30 },
+  {name:'Bali 1',             blessMin:60,  vipMin:60 },
+  {name:'Bali 2',             blessMin:60,  vipMin:60 },
+  {name:'Bali 3',             blessMin:60,  vipMin:60 },
   {name:'Witch Doctor',       blessMin:20,  vipMin:20 },
   {name:'Hammerhead',         blessMin:90,  vipMin:90 },
-  {name:'IK 1',               blessMin:120, vipMin:120},
-  {name:'IK 2',               blessMin:240, vipMin:240},
-  {name:'IK 3',               blessMin:360, vipMin:360},
-  {name:'IK 4',               blessMin:480, vipMin:480},
-  {name:'IK 5',               blessMin:600, vipMin:600},
-  {name:'IK 6',               blessMin:720, vipMin:780},
   {name:'Doomed Knight',      blessMin:180, vipMin:180},
   {name:'Sword Master',       blessMin:270, vipMin:270},
   {name:'Demonic Priest',     blessMin:330, vipMin:330},
   {name:'Cursed Necromancer', blessMin:210, vipMin:210},
   {name:'Queen of the Damned',blessMin:390, vipMin:390},
   {name:'Knight Commander',   blessMin:300, vipMin:300},
-  {name:'Bali 1',             blessMin:60,  vipMin:60 },
-  {name:'Bali 2',             blessMin:60,  vipMin:60 },
-  {name:'Bali 3',             blessMin:60,  vipMin:60 },
-  {name:'Soldier',            blessMin:30,  vipMin:30 },
+  {name:'IK 1',               blessMin:120, vipMin:120},
+  {name:'IK 2',               blessMin:240, vipMin:240},
+  {name:'IK 3',               blessMin:360, vipMin:360},
+  {name:'IK 4',               blessMin:480, vipMin:480},
+  {name:'IK 5',               blessMin:600, vipMin:600},
+  {name:'IK 6',               blessMin:720, vipMin:780},
   {name:'Raahu',              blessMin:540, vipMin:null},
   {name:'Master Assassin',    blessMin:420, vipMin:null},
   {name:'Artemis Natas',      blessMin:660, vipMin:null},
   {name:'Descendant',         blessMin:780, vipMin:null},
   {name:'Elite Demon Rider',  blessMin:510, vipMin:null},
-  {name:'Asteroth',           blessMin:-1,  vipMin:null, fixed:true, fixedHour:21},
+  {name:'Asteroth',           blessMin:-1,  vipMin:null,fixed:true,fixedHour:21},
   {name:'Darion',             blessMin:840, vipMin:null},
   {name:'Slaanesh',           blessMin:900, vipMin:null},
   {name:'Erohim',             blessMin:1500,vipMin:null},
