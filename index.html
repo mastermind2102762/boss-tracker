@@ -156,15 +156,19 @@ const API_KEY='$2a$10$WcKd4x3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
 const API_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 const EVENTS=[
-  {id:'bc', name:'Blood Castle',    type:'hourly',    minute:25,duration:5},
-  {id:'cc', name:'Chaos Castle',    type:'alternate', minute:55,duration:5,parity:'even'},
-  {id:'ds', name:'Devil Square',    type:'alternate', minute:55,duration:5,parity:'odd'},
-  {id:'rb', name:'Rabbits',         type:'hourly',    minute:0, duration:10},
-  {id:'ww', name:'White Wizards',   type:'hourly',    minute:30,duration:10},
-  {id:'gd', name:'Golden Dragons',  type:'hourly',    minute:0, duration:10},
-  {id:'rd', name:'Red Dragons',     type:'hourly',    minute:0, duration:10},
-  {id:'hh', name:'Happy Hour',      type:'hourly',    minute:0, duration:60},
-  {id:'tdm',name:'Team Deathmatch', type:'hourly',    minute:0, duration:30},
+  {id:'bc',  name:'Blood Castle',    type:'hourly',    minute:25, duration:5},
+  {id:'cc',  name:'Chaos Castle',    type:'alternate', minute:55, duration:5, parity:'even'},
+  {id:'ds',  name:'Devil Square',    type:'alternate', minute:55, duration:5, parity:'odd'},
+  {id:'rb',  name:'White Rabbits',   type:'fixed',     hour:13,   minute:47, duration:10},
+  {id:'col', name:'Colloseum',       type:'fixed',     hour:9,    minute:20, duration:10},
+  {id:'rd',  name:'Red Dragon',      type:'fixedloop', hour:9,    minute:10, intervalH:2, duration:10},
+  {id:'gd',  name:'Golden Dragon',   type:'fixedloop', hour:9,    minute:15, intervalH:2, duration:10},
+  {id:'mt',  name:'Magic Treasure',  type:'fixedloop', hour:9,    minute:20, intervalH:2, duration:10},
+  {id:'dk',  name:'Death King',      type:'fixed',     hour:8,    minute:50, duration:10},
+  {id:'cd',  name:'Castle Deep',     type:'fixed',     hour:16,   minute:0,  duration:10},
+  {id:'tdm1',name:'Team Deathmatch', type:'fixed',     hour:14,   minute:0,  duration:30},
+  {id:'tdm2',name:'Team Deathmatch', type:'fixed',     hour:20,   minute:0,  duration:30},
+  {id:'hh',  name:'Happy Hour',      type:'hourly',    minute:0,  duration:60},
 ];
 
 const BOSS_GROUPS=[
@@ -250,16 +254,49 @@ function getFixedMs(h){
 function getNextEv(ev){
   const t=getSrv(),h=t.getUTCHours(),m=t.getUTCMinutes(),s=t.getUTCSeconds();
   const nowMs=h*3600000+m*60000+s*1000;
-  let nH;
-  if(ev.type==='hourly'){nH=(m<ev.minute||(m===ev.minute&&s===0))?h:h+1;}
-  else{const f=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;let c=h;if(!f(c)||m>ev.minute||(m===ev.minute&&s>0))c++;while(!f(c))c++;nH=c;}
-  nH=nH%24;
-  let nMs=nH*3600000+ev.minute*60000;
-  if(nMs<=nowMs)nMs+=86400000;
-  let isOpen=false;
-  if(ev.type==='hourly'){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}
-  else{const f=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;if(f(h)){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}}
-  return{msLeft:nMs-nowMs,isOpen};
+  let msLeft, isOpen=false;
+
+  if(ev.type==='hourly'){
+    const nH=(m<ev.minute||(m===ev.minute&&s===0))?h:h+1;
+    let nMs=(nH%24)*3600000+ev.minute*60000;
+    if(nMs<=nowMs)nMs+=86400000;
+    msLeft=nMs-nowMs;
+    const st=h*3600000+ev.minute*60000;
+    isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;
+
+  } else if(ev.type==='alternate'){
+    const f=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;
+    let c=h;if(!f(c)||m>ev.minute||(m===ev.minute&&s>0))c++;
+    while(!f(c))c++;
+    let nMs=(c%24)*3600000+ev.minute*60000;
+    if(nMs<=nowMs)nMs+=86400000;
+    msLeft=nMs-nowMs;
+    if(f(h)){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}
+
+  } else if(ev.type==='fixed'){
+    const target=ev.hour*3600000+ev.minute*60000;
+    let diff=target-nowMs;
+    if(diff<=0)diff+=86400000;
+    msLeft=diff;
+    isOpen=nowMs>=target&&nowMs<target+ev.duration*60000;
+
+  } else if(ev.type==='fixedloop'){
+    // starts at ev.hour:ev.minute then every intervalH hours
+    const startMs=ev.hour*3600000+ev.minute*60000;
+    const interval=ev.intervalH*3600000;
+    // find next occurrence
+    let next=startMs;
+    while(next<=nowMs) next+=interval;
+    msLeft=next-nowMs;
+    // check if currently open
+    let check=startMs;
+    while(check<=nowMs){
+      if(nowMs>=check&&nowMs<check+ev.duration*60000){isOpen=true;break;}
+      check+=interval;
+    }
+  }
+
+  return{msLeft,isOpen};
 }
 
 function getBS(id,min){
