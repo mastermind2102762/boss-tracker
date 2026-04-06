@@ -70,6 +70,17 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 </style>
 </head>
 <body>
+<div id="modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:#111318;border:1px solid #c8a84b;border-radius:8px;padding:2rem 2.5rem;text-align:center;max-width:360px;">
+    <div style="font-size:12px;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:10px;">Важный вопрос</div>
+    <div style="font-size:20px;font-weight:700;letter-spacing:1px;color:#e8e6e0;margin-bottom:1.5rem;">Ты скинул зен<br>в гильдбанк?</div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="modalYes()" style="padding:10px 28px;border:1px solid #52c878;background:transparent;color:#52c878;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:3px;cursor:pointer;">ДА</button>
+      <button onclick="modalNo()" style="padding:10px 28px;border:1px solid #e05252;background:transparent;color:#e05252;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:3px;cursor:pointer;">НЕТ</button>
+    </div>
+    <div id="modal-msg" style="margin-top:1rem;font-size:17px;font-weight:700;color:#e05252;min-height:26px;letter-spacing:1px;"></div>
+  </div>
+</div>
 <div style="max-width:1400px;margin:0 auto;">
 <header>
   <div class="logo">Guild Tool</div>
@@ -129,9 +140,9 @@ const API_KEY='$2a$10$WcKd4x3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
 const API_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 const EVENTS=[
-  {id:'bc', name:'Blood Castle',    type:'hourly',    minute:25,duration:15},
-  {id:'cc', name:'Chaos Castle',    type:'alternate', minute:55,duration:10,parity:'even'},
-  {id:'ds', name:'Devil Square',    type:'alternate', minute:55,duration:10,parity:'odd'},
+  {id:'bc', name:'Blood Castle',    type:'hourly',    minute:25,duration:5},
+  {id:'cc', name:'Chaos Castle',    type:'alternate', minute:55,duration:5,parity:'even'},
+  {id:'ds', name:'Devil Square',    type:'alternate', minute:55,duration:5,parity:'odd'},
   {id:'rb', name:'Rabbits',         type:'hourly',    minute:0, duration:10},
   {id:'ww', name:'White Wizards',   type:'hourly',    minute:30,duration:10},
   {id:'gd', name:'Golden Dragons',  type:'hourly',    minute:0, duration:10},
@@ -246,6 +257,29 @@ function toggleNotif(id){
   const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
 }
+
+function modalYes(){
+  unlockAudio();
+  document.getElementById('modal').style.display='none';
+}
+function modalNo(){
+  unlockAudio();
+  document.getElementById('modal-msg').textContent='Ну ты и мудак 🤦';
+  setTimeout(()=>{ document.getElementById('modal').style.display='none'; }, 2000);
+}
+
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked)return;
+  audioUnlocked=true;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const buf=ctx.createBuffer(1,1,22050);
+    const src=ctx.createBufferSource();
+    src.buffer=buf;src.connect(ctx.destination);src.start(0);
+  }catch(e){}
+}
+document.addEventListener('click',unlockAudio,{once:true});
 
 function playAlert(file){
   try{new Audio(file).play();}catch(e){}
