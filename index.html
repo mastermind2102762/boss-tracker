@@ -395,7 +395,6 @@ const MEMBERS=[
   {password:'problema', name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
   {password:'junior',   name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
   {password:'osteo1',   name:'Artem',    greeting:'ШО ТИ, ЛИСИЙ?'},
-  {password:'antoha22',   name:'Anyway',    greeting:'ЗДАРОВА ЗАЕБАЛ'},
 ];
 
 function checkPass(){
@@ -459,11 +458,11 @@ function renderBosses(){
         const txt=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
         const hasSound=!!BOSS_SOUNDS[b.id];
         const notifBtn=hasSound?`<button class="notif-btn ${getNotif('boss_'+b.id)?'on':'off'}" onclick="event.stopPropagation();toggleNotif('boss_${b.id}')" title="Sound alert">&#9836;</button>`:'';
-        return`<div class="bitem ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}',${b.min})">
-          <div class="bitem-name">${b.name}</div>
-          <div style="text-align:right;display:flex;align-items:center;gap:6px;">
-            ${notifBtn}
-            <div>
+        return`<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+          ${notifBtn}
+          <div class="bitem ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}',${b.min})" style="flex:1;margin-bottom:0;">
+            <div class="bitem-name">${b.name}</div>
+            <div style="text-align:right">
               <div class="bitem-timer ${status==='idle'?'':status}" id="bt-${b.id}">${txt}</div>
               <div class="bitem-sub">${fmtL(b.min)}</div>
             </div>
