@@ -250,15 +250,8 @@ function toggleBCNotif(){
 
 function playAlert(){
   try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [0,0.3,0.6].forEach(t=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);
-      o.frequency.value=880;o.type='sine';
-      g.gain.setValueAtTime(0.4,ctx.currentTime+t);
-      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
-      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
-    });
+    const audio = new Audio('bc.mp3');
+    audio.play();
   }catch(e){}
 }
 
