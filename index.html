@@ -96,6 +96,13 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
   </div>
 </header>
 
+<div style="display:flex;justify-content:center;margin-bottom:1.5rem;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;">Online:</span>
+    <div id="onlineUsers" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+  </div>
+</div>
+
 <div class="layout">
   <!-- COL 1: Events + Fortress -->
   <div>
@@ -406,6 +413,7 @@ function checkPass(){
     msg.textContent=member.greeting;
     currentUser=member.name;
     unlockAudio();
+    pingOnline();
     setTimeout(()=>{ document.getElementById('modal').style.display='none'; }, 1500);
   } else {
     msg.style.color='#e05252';
@@ -670,12 +678,36 @@ function renderLog(){
   el.innerHTML=activityLog.map(l=>`<div style="padding:3px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);">${l}</div>`).join('');
 }
 
+function renderOnline(onlineUsers){
+  const now=Date.now();
+  const active=Object.entries(onlineUsers||{}).filter(([,ts])=>now-ts<30000);
+  const el=document.getElementById('onlineUsers');if(!el)return;
+  if(active.length===0){el.innerHTML='<span style="font-size:12px;color:var(--muted);">никого нет</span>';return;}
+  el.innerHTML=active.map(([name])=>`
+    <span style="background:var(--bg);border:1px solid var(--success);border-radius:3px;padding:3px 10px;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--success);text-transform:uppercase;">${name}</span>
+  `).join('');
+}
+
+async function pingOnline(){
+  if(currentUser==='Unknown')return;
+  try{
+    const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    const d=await r.json();
+    const online=d.record.online||{};
+    online[currentUser]=Date.now();
+    // Чистим старых (>30 сек)
+    Object.keys(online).forEach(k=>{if(Date.now()-online[k]>30000)delete online[k];});
+    renderOnline(online);
+    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+      body:JSON.stringify({bosses:state,log:activityLog,online})});
+  }catch(e){}
+}
+
 async function loadState(){
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
     const fetchEnd=Date.now();
-    // Синхронизируем время с сервером
     const serverDate=r.headers.get('date');
     if(serverDate){
       const serverTs=new Date(serverDate).getTime();
@@ -688,12 +720,17 @@ async function loadState(){
     if(JSON.stringify(newLog)!==JSON.stringify(activityLog)){
       activityLog=newLog;renderLog();
     }
+    renderOnline(d.record.online||{});
     setStatus(true,'Синхронизировано');
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
 async function saveState(){
   try{
-    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify({bosses:state,log:activityLog})});
+    const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    const d=await r.json();
+    const online=d.record.online||{};
+    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+      body:JSON.stringify({bosses:state,log:activityLog,online})});
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
   }catch(e){setStatus(false,'Ошибка сохранения');}
 }
@@ -712,6 +749,7 @@ async function init(){
   renderEvents();renderBosses();renderArena();renderLog();renderFortress();
   setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();},1000);
   setInterval(async()=>{await loadState();},5000);
+  setInterval(pingOnline, 10000);
 }
 updateSrvTime();init();
 </script>
