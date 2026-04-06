@@ -7,30 +7,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --border: #2a2d36;
-    --accent: #c8a84b;
-    --text: #e8e6e0;
-    --muted: #6b6f7a;
-    --danger: #e05252;
-    --success: #52c878;
-    --warning: #e09652;
+    --bg: #0a0c10; --surface: #111318; --border: #2a2d36;
+    --accent: #c8a84b; --text: #e8e6e0; --muted: #6b6f7a;
+    --danger: #e05252; --success: #52c878; --warning: #e09652;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; padding: 1.5rem 1rem; }
-
   header { text-align: center; margin-bottom: 1.5rem; }
   .logo { font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
   h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
   .divider { width: 50px; height: 2px; background: var(--accent); margin: 10px auto; }
   .server-time { font-family: 'Share Tech Mono', monospace; font-size: 20px; color: var(--accent); letter-spacing: 3px; margin: 4px 0; }
 
-  .layout { display: grid; grid-template-columns: 190px 230px 1fr; gap: 14px; align-items: start; }
+  .layout { display: grid; grid-template-columns: 185px 220px 1fr; gap: 14px; align-items: start; }
 
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px; margin-bottom: 14px; }
+  .panel:last-child { margin-bottom: 0; }
   .panel-title { font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 
+  /* EVENTS */
   .event-item { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .event-item:last-child { border-bottom: none; }
   .event-name { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -38,6 +33,7 @@
   .event-timer.soon { color: var(--warning); }
   .event-timer.open { color: var(--success); animation: pulse 1s infinite; }
 
+  /* BOSSES */
   .boss-group { margin-bottom: 10px; }
   .boss-group:last-child { margin-bottom: 0; }
   .boss-group-name { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; padding-left: 4px; }
@@ -53,18 +49,21 @@
   .boss-item-timer.ready { color: var(--success); animation: pulse 1s infinite; }
   .boss-item-respawn { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
 
+  /* TABLES */
   .loc-table { width: 100%; border-collapse: collapse; }
-  .loc-table th { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; padding: 6px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+  .loc-table th { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; padding: 5px 5px; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
   .loc-table th.boss-col { text-align: left; }
-  .loc-table td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .loc-table td { padding: 4px 5px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .loc-table tr:last-child td { border-bottom: none; }
   .loc-name { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
   .loc-respawn { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
   .loc-cell { text-align: center; }
-  .loc-timer { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); cursor: pointer; padding: 3px 5px; border-radius: 3px; border: 1px solid transparent; transition: all 0.15s; display: inline-block; min-width: 58px; }
+  .loc-timer { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer; padding: 3px 4px; border-radius: 3px; border: 1px solid transparent; transition: all 0.15s; display: inline-block; min-width: 52px; }
   .loc-timer:hover { border-color: var(--accent); color: var(--accent); }
   .loc-timer.active { color: var(--danger); border-color: #2a1a1a; }
   .loc-timer.ready { color: var(--success); animation: pulse 1s infinite; }
+  .loc-timer.fixed { color: var(--warning); cursor: default; }
+  .loc-timer.fixed:hover { border-color: transparent; color: var(--warning); }
 
   .status-bar { display: flex; align-items: center; gap: 8px; margin-top: 1rem; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
@@ -73,7 +72,7 @@
 </style>
 </head>
 <body>
-<div style="max-width:1300px;margin:0 auto;">
+<div style="max-width:1400px;margin:0 auto;">
   <header>
     <div class="logo">Guild Tool</div>
     <h1>Boss Tracker by Kabal</h1>
@@ -82,23 +81,48 @@
   </header>
 
   <div class="layout">
-    <div class="panel">
-      <div class="panel-title">Events</div>
-      <div id="eventList"></div>
+    <!-- LEFT: Events + Bosses -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Events</div>
+        <div id="eventList"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Bosses</div>
+        <div id="bossList"></div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-title">Bosses</div>
-      <div id="bossList"></div>
+
+    <!-- CENTER: placeholder for future -->
+    <div>
+      <div class="panel" style="min-height:100px;">
+        <div class="panel-title">Kalima</div>
+        <div style="color:var(--muted);font-size:12px;letter-spacing:1px;padding:8px 0;">Coming soon...</div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-title">VIP Arena</div>
-      <table class="loc-table">
-        <thead><tr>
-          <th class="boss-col">Boss</th>
-          <th>Main</th><th>Sub1</th><th>Sub2</th>
-        </tr></thead>
-        <tbody id="locTable"></tbody>
-      </table>
+
+    <!-- RIGHT: VIP + Bless tables -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">VIP Arena — Main / Sub1 / Sub2</div>
+        <table class="loc-table">
+          <thead><tr>
+            <th class="boss-col">Boss</th>
+            <th>Main</th><th>Sub1</th><th>Sub2</th>
+          </tr></thead>
+          <tbody id="vipTable"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Bless Arena</div>
+        <table class="loc-table">
+          <thead><tr>
+            <th class="boss-col">Boss</th>
+            <th>Bless</th>
+          </tr></thead>
+          <tbody id="blessTable"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -125,18 +149,18 @@ const EVENTS = [
 ];
 
 const BOSS_GROUPS = [
-  { name: 'Zaikan Tarkan', bosses: [
+  { name:'Zaikan Tarkan', bosses:[
     { id:'zt_main', name:'Main', min:300 },
     { id:'zt_sub1', name:'Sub1', min:300 },
     { id:'zt_sub2', name:'Sub2', min:300 },
   ]},
-  { name: 'Zaikan Lorencia', bosses: [
+  { name:'Zaikan Lorencia', bosses:[
     { id:'zl', name:'Lorencia', min:300 },
   ]},
-  { name: 'Dark Elf', bosses: [
+  { name:'Dark Elf', bosses:[
     { id:'de', name:'Dark Elf', min:60 },
   ]},
-  { name: 'Illusion of Kundun', bosses: [
+  { name:'Illusion of Kundun', bosses:[
     { id:'iok1', name:'IK 1', min:120 },
     { id:'iok2', name:'IK 2', min:300 },
     { id:'iok3', name:'IK 3', min:480 },
@@ -146,22 +170,61 @@ const BOSS_GROUPS = [
   ]},
 ];
 
+// VIP Arena — same timing across Main/Sub1/Sub2
 const VIP_BOSSES = [
-  { id:'fortune',   name:'Fortune Pouch',       min:30  },
-  { id:'witch',     name:'Witch Doctor',         min:20  },
-  { id:'hammer',    name:'Hammerhead',           min:90  },
-  { id:'doomed',    name:'Doomed Knight',        min:180 },
-  { id:'sword',     name:'Sword Master',         min:270 },
-  { id:'demonic',   name:'Demonic Priest',       min:330 },
-  { id:'cursed',    name:'Cursed Necromancer',   min:210 },
-  { id:'queen',     name:'Queen of the Damned',  min:390 },
-  { id:'knight',    name:'Knight Commander',     min:300 },
-  { id:'bali1',     name:'Bali 1',               min:60  },
-  { id:'bali2',     name:'Bali 2',               min:60  },
-  { id:'bali3',     name:'Bali 3',               min:60  },
-  { id:'soldier',   name:'Soldier',              min:30  },
+  { id:'vip_fp',   name:'Fortune Pouch',       min:30  },
+  { id:'vip_wd',   name:'Witch Doctor',         min:20  },
+  { id:'vip_hh',   name:'Hammerhead',           min:90  },
+  { id:'vip_ik1',  name:'IK 1',                 min:120 },
+  { id:'vip_ik2',  name:'IK 2',                 min:240 },
+  { id:'vip_ik3',  name:'IK 3',                 min:360 },
+  { id:'vip_ik4',  name:'IK 4',                 min:480 },
+  { id:'vip_ik5',  name:'IK 5',                 min:600 },
+  { id:'vip_ik6',  name:'IK 6',                 min:780 },
+  { id:'vip_dk',   name:'Doomed Knight',        min:180 },
+  { id:'vip_sm',   name:'Sword Master',         min:270 },
+  { id:'vip_dp',   name:'Demonic Priest',       min:330 },
+  { id:'vip_cn',   name:'Cursed Necromancer',   min:210 },
+  { id:'vip_qd',   name:'Queen of the Damned',  min:390 },
+  { id:'vip_kc',   name:'Knight Commander',     min:300 },
+  { id:'vip_b1',   name:'Bali 1',               min:60  },
+  { id:'vip_b2',   name:'Bali 2',               min:60  },
+  { id:'vip_b3',   name:'Bali 3',               min:60  },
+  { id:'vip_sl',   name:'Soldier',              min:30  },
 ];
-const LOCS = ['main','sub1','sub2'];
+const VIP_LOCS = ['main','sub1','sub2'];
+
+// Bless Arena — different timings + unique bosses
+const BLESS_BOSSES = [
+  { id:'bl_fp',   name:'Fortune Pouch',       min:10  },
+  { id:'bl_wd',   name:'Witch Doctor',         min:20  },
+  { id:'bl_hh',   name:'Hammerhead',           min:90  },
+  { id:'bl_ik1',  name:'IK 1',                 min:120 },
+  { id:'bl_ik2',  name:'IK 2',                 min:240 },
+  { id:'bl_ik3',  name:'IK 3',                 min:360 },
+  { id:'bl_ik4',  name:'IK 4',                 min:480 },
+  { id:'bl_ik5',  name:'IK 5',                 min:600 },
+  { id:'bl_ik6',  name:'IK 6',                 min:720 },
+  { id:'bl_dk',   name:'Doomed Knight',        min:180 },
+  { id:'bl_sm',   name:'Sword Master',         min:270 },
+  { id:'bl_dp',   name:'Demonic Priest',       min:330 },
+  { id:'bl_cn',   name:'Cursed Necromancer',   min:210 },
+  { id:'bl_qd',   name:'Queen of the Damned',  min:390 },
+  { id:'bl_kc',   name:'Knight Commander',     min:300 },
+  { id:'bl_sl',   name:'Soldier',              min:30  },
+  { id:'bl_b1',   name:'Bali 1',               min:60  },
+  { id:'bl_b2',   name:'Bali 2',               min:60  },
+  { id:'bl_b3',   name:'Bali 3',               min:60  },
+  { id:'bl_rh',   name:'Raahu',                min:540 },
+  { id:'bl_ma',   name:'Master Assassin',      min:420 },
+  { id:'bl_an',   name:'Artemis Natas',        min:660 },
+  { id:'bl_de',   name:'Descendant',           min:780 },
+  { id:'bl_edr',  name:'Elite Demon Rider',    min:510 },
+  { id:'bl_ast',  name:'Asteroth',             min:-1  }, // fixed 21:00
+  { id:'bl_dar',  name:'Darion',               min:840 },
+  { id:'bl_sla',  name:'Slaanesh',             min:900 },
+  { id:'bl_ero',  name:'Erohim',               min:1500},
+];
 
 let state = {};
 
@@ -176,12 +239,22 @@ function fmtShort(ms) {
   if (ms <= 0) return '00:00';
   const s = Math.floor(ms/1000);
   const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  if (h > 0) return [h, m, sec].map(x=>String(x).padStart(2,'0')).join(':');
-  return [m, sec].map(x=>String(x).padStart(2,'0')).join(':');
+  return h > 0 ? [h,m,sec].map(x=>String(x).padStart(2,'0')).join(':') : [m,sec].map(x=>String(x).padStart(2,'0')).join(':');
 }
 function fmtLabel(min) {
-  if (min >= 60) return (min/60)%1===0 ? (min/60)+'h' : (min/60).toFixed(1)+'h';
+  if (min < 0) return '21:00';
+  if (min >= 60) return (min%60===0 ? (min/60)+'h' : (min/60).toFixed(1)+'h');
   return min+'min';
+}
+
+// Fixed time boss (Asteroth 21:00 server)
+function getFixedTimer(hour, minute) {
+  const t = getServerTime();
+  const now = t.getUTCHours()*3600 + t.getUTCMinutes()*60 + t.getUTCSeconds();
+  const target = hour*3600 + (minute||0)*60;
+  let diff = target - now;
+  if (diff <= 0) diff += 86400;
+  return diff * 1000;
 }
 
 function getNextEvent(ev) {
@@ -190,7 +263,7 @@ function getNextEvent(ev) {
   const nowMs = h*3600000+m*60000+s*1000;
   let nextH;
   if (ev.type==='hourly') {
-    nextH = (m < ev.minute || (m===ev.minute && s===0)) ? h : h+1;
+    nextH = (m<ev.minute||(m===ev.minute&&s===0)) ? h : h+1;
   } else {
     const match = ev.parity==='even' ? hh=>hh%2===0 : hh=>hh%2!==0;
     let c=h; if(!match(c)||m>ev.minute||(m===ev.minute&&s>0)) c++;
@@ -202,13 +275,14 @@ function getNextEvent(ev) {
   let isOpen=false;
   if(ev.type==='hourly'){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}
   else{const match=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;if(match(h)){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}}
-  return { msLeft: nextMs-nowMs, isOpen };
+  return { msLeft:nextMs-nowMs, isOpen };
 }
 
-function getBossState(id, minRespawn) {
+function getBossState(id, min) {
+  if (min < 0) return { status:'fixed', left: getFixedTimer(21,0) };
   const s = state[id];
   if (!s) return { status:'idle', left:0 };
-  const left = minRespawn*60000 - (Date.now()-s.startedAt);
+  const left = min*60000 - (Date.now()-s.startedAt);
   return { status: left>0?'active':'ready', left: Math.max(0,left) };
 }
 
@@ -239,17 +313,31 @@ function renderBosses() {
     </div>`).join('');
 }
 
-function renderLocTable() {
-  document.getElementById('locTable').innerHTML = VIP_BOSSES.map(b=>`
+function renderVipTable() {
+  document.getElementById('vipTable').innerHTML = VIP_BOSSES.map(b=>`
     <tr>
       <td><div class="loc-name">${b.name}</div><div class="loc-respawn">${fmtLabel(b.min)}</div></td>
-      ${LOCS.map(loc=>{
+      ${VIP_LOCS.map(loc=>{
         const key=b.id+'_'+loc;
         const {status,left}=getBossState(key,b.min);
         const txt=status==='idle'?'——':status==='ready'?'READY':fmtShort(left);
-        return `<td class="loc-cell"><div class="loc-timer ${status==='idle'?'':status}" id="lt-${key}" onclick="toggleLoc('${b.id}','${loc}',${b.min})">${txt}</div></td>`;
+        return `<td class="loc-cell"><div class="loc-timer ${status==='idle'?'':status}" id="lt-${key}" onclick="toggleLoc('${key}',${b.min})">${txt}</div></td>`;
       }).join('')}
     </tr>`).join('');
+}
+
+function renderBlessTable() {
+  document.getElementById('blessTable').innerHTML = BLESS_BOSSES.map(b=>{
+    const {status,left}=getBossState(b.id,b.min);
+    const isFixed = b.min < 0;
+    const txt = isFixed ? fmt(left) : status==='idle'?'——':status==='ready'?'READY':fmtShort(left);
+    const cls = isFixed ? 'fixed' : (status==='idle'?'':status);
+    const onclick = isFixed ? '' : `onclick="toggleLoc('${b.id}',${b.min})"`;
+    return `<tr>
+      <td><div class="loc-name">${b.name}</div><div class="loc-respawn">${fmtLabel(b.min)}</div></td>
+      <td class="loc-cell"><div class="loc-timer ${cls}" id="lt-${b.id}" ${onclick}>${txt}</div></td>
+    </tr>`;
+  }).join('');
 }
 
 function tickEvents() {
@@ -274,8 +362,8 @@ function tickBosses() {
   }));
 }
 
-function tickLoc() {
-  VIP_BOSSES.forEach(b=>LOCS.forEach(loc=>{
+function tickVip() {
+  VIP_BOSSES.forEach(b=>VIP_LOCS.forEach(loc=>{
     const key=b.id+'_'+loc;
     const {status,left}=getBossState(key,b.min);
     const el=document.getElementById('lt-'+key); if(!el)return;
@@ -284,16 +372,26 @@ function tickLoc() {
   }));
 }
 
+function tickBless() {
+  BLESS_BOSSES.forEach(b=>{
+    const {status,left}=getBossState(b.id,b.min);
+    const el=document.getElementById('lt-'+b.id); if(!el)return;
+    const isFixed=b.min<0;
+    el.textContent=isFixed?fmt(left):(status==='idle'?'——':status==='ready'?'READY':fmtShort(left));
+    el.className='loc-timer'+(isFixed?' fixed':status==='idle'?'':' '+status);
+  });
+}
+
 async function toggleBoss(id,min) {
   const {status}=getBossState(id,min);
   if(status==='active') delete state[id]; else state[id]={startedAt:Date.now()};
   renderBosses(); await saveState();
 }
-async function toggleLoc(bossId,loc,min) {
-  const key=bossId+'_'+loc;
+async function toggleLoc(key,min) {
+  if(min<0) return;
   const {status}=getBossState(key,min);
   if(status==='active') delete state[key]; else state[key]={startedAt:Date.now()};
-  renderLocTable(); await saveState();
+  renderVipTable(); renderBlessTable(); await saveState();
 }
 
 async function loadState() {
@@ -321,8 +419,8 @@ function updateServerTime(){
 
 async function init(){
   await loadState();
-  renderEvents(); renderBosses(); renderLocTable();
-  setInterval(()=>{updateServerTime();tickEvents();tickBosses();tickLoc();},1000);
+  renderEvents(); renderBosses(); renderVipTable(); renderBlessTable();
+  setInterval(()=>{updateServerTime();tickEvents();tickBosses();tickVip();tickBless();},1000);
   setInterval(async()=>{await loadState();},15000);
 }
 updateServerTime(); init();
