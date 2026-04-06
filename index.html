@@ -349,7 +349,7 @@ function toggleNotif(id){
   const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
   // FP кнопки не имеют id — перерендерим арену
-  if(id.startsWith('fp_'))renderArena();
+  if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_'))renderArena();
 }
 
 const MEMBERS=[
@@ -432,12 +432,17 @@ function renderArena(){
   document.getElementById('arenaTable').innerHTML=ARENA_BOSSES.map(b=>{
     const bid=makeId(b.name,'a');
     const isFP=b.name==='Fortune Pouch';
+    const isSoldier=b.name==='Soldier';
+    const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
+    const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     const bl=getBS(bid+'_bl',b.blessMin);
     const blTxt=b.blessMin===null?'—':bl.status==='fixed'?fmtS(bl.left):bl.status==='idle'?fmtL(b.blessMin):bl.status==='ready'?'READY':fmtS(bl.left);
     const blCls=b.blessMin===null?'none':bl.status==='fixed'?'fixed':bl.status==='idle'?'':bl.status;
     const blClick=b.blessMin!==null&&b.blessMin>=0?`onclick="toggleArena('${bid}_bl',${b.blessMin})"`:'' ;
-    const blNotif=isFP?`<button class="notif-btn ${getNotif('fp_bl')?'on':'off'}" onclick="toggleNotif('fp_bl')" title="Sound alert">&#9836;</button>`:'';
+    const blNotif=isFP?`<button class="notif-btn ${getNotif('fp_bl')?'on':'off'}" onclick="toggleNotif('fp_bl')" title="Sound alert">&#9836;</button>`:
+                  isSoldier?`<button class="notif-btn ${getNotif('sl_bl')?'on':'off'}" onclick="toggleNotif('sl_bl')" title="Sound alert">&#9836;</button>`:
+                  isBali?`<button class="notif-btn ${getNotif(bk+'bl')?'on':'off'}" onclick="toggleNotif('${bk}bl')" title="Sound alert">&#9836;</button>`:'';
     // VIP cols
     const vipCols=['main','sub1','sub2'].map(loc=>{
       if(b.vipMin===null)return`<td class="acell"><div class="atimer none">—</div></td>`;
@@ -445,8 +450,10 @@ function renderArena(){
       const vs=getBS(key,b.vipMin);
       const txt=vs.status==='idle'?fmtL(b.vipMin):vs.status==='ready'?'READY':fmtS(vs.left);
       const cls=vs.status==='idle'?'':vs.status;
-      const fpNotif=isFP?`<button class="notif-btn ${getNotif('fp_'+loc)?'on':'off'}" onclick="toggleNotif('fp_${loc}')" title="Sound alert">&#9836;</button>`:'';
-      return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${fpNotif}</td>`;
+      const cellNotif=isFP?`<button class="notif-btn ${getNotif('fp_'+loc)?'on':'off'}" onclick="toggleNotif('fp_${loc}')" title="Sound alert">&#9836;</button>`:
+                      isSoldier?`<button class="notif-btn ${getNotif('sl_'+loc)?'on':'off'}" onclick="toggleNotif('sl_${loc}')" title="Sound alert">&#9836;</button>`:
+                      isBali?`<button class="notif-btn ${getNotif(bk+loc)?'on':'off'}" onclick="toggleNotif('${bk}${loc}')" title="Sound alert">&#9836;</button>`:'';
+      return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${cellNotif}</td>`;
     }).join('');
     return`<tr>
       <td><div class="aname">${b.name}</div></td>
@@ -482,11 +489,18 @@ function tickBosses(){
 
 const fpAlertFired={bl:false,main:false,sub1:false,sub2:false};
 const FP_SOUNDS={bl:'fpba.mp3',main:'fpmain.mp3',sub1:'fpsub1.mp3',sub2:'fpsub2.mp3'};
+const soldierAlertFired={bl:false,main:false,sub1:false,sub2:false};
+const SOLDIER_SOUNDS={bl:'basoldier.mp3',main:'mainsoldier.mp3',sub1:'s1soldier.mp3',sub2:'s2soldier.mp3'};
+const baliAlertFired={b1_bl:false,b1_main:false,b1_sub1:false,b1_sub2:false,b2_bl:false,b2_main:false,b2_sub1:false,b2_sub2:false,b3_bl:false,b3_main:false,b3_sub1:false,b3_sub2:false};
+const BALI_SOUNDS={bl:'babali.mp3',main:'mainbali.mp3',sub1:'s1bali.mp3',sub2:'s2bali.mp3'};
 
 function tickArena(){
   ARENA_BOSSES.forEach(b=>{
     const bid=makeId(b.name,'a');
     const isFP=b.name==='Fortune Pouch';
+    const isSoldier=b.name==='Soldier';
+    const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
+    const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     if(b.blessMin!==null){
       const el=document.getElementById('lt-'+bid+'_bl');if(!el)return;
@@ -497,6 +511,15 @@ function tickArena(){
       if(isFP&&s.status==='active'){
         if(s.left<=60000&&s.left>0&&getNotif('fp_bl')){if(!fpAlertFired.bl){fpAlertFired.bl=true;playAlert(FP_SOUNDS.bl);}}
         else if(s.left>60000){fpAlertFired.bl=false;}
+      }
+      if(isSoldier&&s.status==='active'){
+        if(s.left<=60000&&s.left>0&&getNotif('sl_bl')){if(!soldierAlertFired.bl){soldierAlertFired.bl=true;playAlert(SOLDIER_SOUNDS.bl);}}
+        else if(s.left>60000){soldierAlertFired.bl=false;}
+      }
+      if(isBali&&s.status==='active'){
+        const ak=bk+'bl';
+        if(s.left<=60000&&s.left>0&&getNotif(ak)){if(!baliAlertFired[ak]){baliAlertFired[ak]=true;playAlert(BALI_SOUNDS.bl);}}
+        else if(s.left>60000){baliAlertFired[ak]=false;}
       }
     }
     // VIP
@@ -510,6 +533,15 @@ function tickArena(){
         if(isFP&&s.status==='active'){
           if(s.left<=60000&&s.left>0&&getNotif('fp_'+loc)){if(!fpAlertFired[loc]){fpAlertFired[loc]=true;playAlert(FP_SOUNDS[loc]);}}
           else if(s.left>60000){fpAlertFired[loc]=false;}
+        }
+        if(isSoldier&&s.status==='active'){
+          if(s.left<=60000&&s.left>0&&getNotif('sl_'+loc)){if(!soldierAlertFired[loc]){soldierAlertFired[loc]=true;playAlert(SOLDIER_SOUNDS[loc]);}}
+          else if(s.left>60000){soldierAlertFired[loc]=false;}
+        }
+        if(isBali&&s.status==='active'){
+          const ak=bk+loc;
+          if(s.left<=60000&&s.left>0&&getNotif(ak)){if(!baliAlertFired[ak]){baliAlertFired[ak]=true;playAlert(BALI_SOUNDS[loc]);}}
+          else if(s.left>60000){baliAlertFired[ak]=false;}
         }
       });
     }
