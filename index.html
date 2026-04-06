@@ -392,7 +392,7 @@ function toggleNotif(id){
   const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
   // FP кнопки не имеют id — перерендерим арену
-  if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_')||id.startsWith('dm_')||id.startsWith('qn_'))renderArena();
+  if(id.startsWith('fp_')||id.startsWith('sl_')||id.startsWith('b1_')||id.startsWith('b2_')||id.startsWith('b3_')||id.startsWith('dm_')||id.startsWith('qn_')||id.startsWith('wd_')||id.startsWith('hh_'))renderArena();
   if(id.startsWith('boss_'))renderBosses();
 }
 
@@ -488,6 +488,8 @@ function renderArena(){
     const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
     const isDoom=b.name==='Doomed Knight';
     const isQueen=b.name==='Queen of the Damned';
+    const isWD=b.name==='Witch Doctor';
+    const isHH=b.name==='Hammerhead';
     const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     const bl=getBS(bid+'_bl',b.blessMin);
@@ -498,7 +500,9 @@ function renderArena(){
                   isSoldier?`<button class="notif-btn ${getNotif('sl_bl')?'on':'off'}" onclick="toggleNotif('sl_bl')" title="Sound alert">&#9836;</button>`:
                   isBali?`<button class="notif-btn ${getNotif(bk+'bl')?'on':'off'}" onclick="toggleNotif('${bk}bl')" title="Sound alert">&#9836;</button>`:
                   isDoom?`<button class="notif-btn ${getNotif('dm_bl')?'on':'off'}" onclick="toggleNotif('dm_bl')" title="Sound alert">&#9836;</button>`:
-                  isQueen?`<button class="notif-btn ${getNotif('qn_bl')?'on':'off'}" onclick="toggleNotif('qn_bl')" title="Sound alert">&#9836;</button>`:'';
+                  isQueen?`<button class="notif-btn ${getNotif('qn_bl')?'on':'off'}" onclick="toggleNotif('qn_bl')" title="Sound alert">&#9836;</button>`:
+                  isWD?`<button class="notif-btn ${getNotif('wd_bl')?'on':'off'}" onclick="toggleNotif('wd_bl')" title="Sound alert">&#9836;</button>`:
+                  isHH?`<button class="notif-btn ${getNotif('hh_bl')?'on':'off'}" onclick="toggleNotif('hh_bl')" title="Sound alert">&#9836;</button>`:'';
     // VIP cols
     const vipCols=['main','sub1','sub2'].map(loc=>{
       if(b.vipMin===null)return`<td class="acell"><div class="atimer none">—</div></td>`;
@@ -510,7 +514,9 @@ function renderArena(){
                       isSoldier?`<button class="notif-btn ${getNotif('sl_'+loc)?'on':'off'}" onclick="toggleNotif('sl_${loc}')" title="Sound alert">&#9836;</button>`:
                       isBali?`<button class="notif-btn ${getNotif(bk+loc)?'on':'off'}" onclick="toggleNotif('${bk}${loc}')" title="Sound alert">&#9836;</button>`:
                       isDoom?`<button class="notif-btn ${getNotif('dm_'+loc)?'on':'off'}" onclick="toggleNotif('dm_${loc}')" title="Sound alert">&#9836;</button>`:
-                      isQueen?`<button class="notif-btn ${getNotif('qn_'+loc)?'on':'off'}" onclick="toggleNotif('qn_${loc}')" title="Sound alert">&#9836;</button>`:'';
+                      isQueen?`<button class="notif-btn ${getNotif('qn_'+loc)?'on':'off'}" onclick="toggleNotif('qn_${loc}')" title="Sound alert">&#9836;</button>`:
+                      isWD?`<button class="notif-btn ${getNotif('wd_'+loc)?'on':'off'}" onclick="toggleNotif('wd_${loc}')" title="Sound alert">&#9836;</button>`:
+                      isHH?`<button class="notif-btn ${getNotif('hh_'+loc)?'on':'off'}" onclick="toggleNotif('hh_${loc}')" title="Sound alert">&#9836;</button>`:'';
       return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${cellNotif}</td>`;
     }).join('');
     return`<tr>
@@ -572,6 +578,10 @@ const doomAlertFired={bl:false,main:false,sub1:false,sub2:false};
 const DOOM_SOUNDS={bl:'doomba.mp3',main:'doommain.mp3',sub1:'dooms1.mp3',sub2:'dooms2.mp3'};
 const queenAlertFired={bl:false,main:false,sub1:false,sub2:false};
 const QUEEN_SOUNDS={bl:'queenba.mp3',main:'queenmain.mp3',sub1:'queens1.mp3',sub2:'queens2.mp3'};
+const wdAlertFired={bl:false,main:false,sub1:false,sub2:false};
+const WD_SOUNDS={bl:'wdba.mp3',main:'wdmain.mp3',sub1:'wds1.mp3',sub2:'wds2.mp3'};
+const hhAlertFired={bl:false,main:false,sub1:false,sub2:false};
+const HH_SOUNDS={bl:'hhba.mp3',main:'hhmain.mp3',sub1:'hhs1.mp3',sub2:'hhs2.mp3'};
 
 function tickArena(){
   ARENA_BOSSES.forEach(b=>{
@@ -581,6 +591,8 @@ function tickArena(){
     const isBali=['Bali 1','Bali 2','Bali 3'].includes(b.name);
     const isDoom=b.name==='Doomed Knight';
     const isQueen=b.name==='Queen of the Damned';
+    const isWD=b.name==='Witch Doctor';
+    const isHH=b.name==='Hammerhead';
     const bk=isBali?'b'+b.name.split(' ')[1]+'_':'';
     // Bless
     if(b.blessMin!==null){
@@ -609,6 +621,14 @@ function tickArena(){
       if(isQueen&&s.status==='active'){
         if(s.left<=180000&&s.left>0&&getNotif('qn_bl')){if(!queenAlertFired.bl){queenAlertFired.bl=true;playAlert(QUEEN_SOUNDS.bl);}}
         else if(s.left>180000){queenAlertFired.bl=false;}
+      }
+      if(isWD&&s.status==='active'){
+        if(s.left<=180000&&s.left>0&&getNotif('wd_bl')){if(!wdAlertFired.bl){wdAlertFired.bl=true;playAlert(WD_SOUNDS.bl);}}
+        else if(s.left>180000){wdAlertFired.bl=false;}
+      }
+      if(isHH&&s.status==='active'){
+        if(s.left<=180000&&s.left>0&&getNotif('hh_bl')){if(!hhAlertFired.bl){hhAlertFired.bl=true;playAlert(HH_SOUNDS.bl);}}
+        else if(s.left>180000){hhAlertFired.bl=false;}
       }
     }
     // VIP
@@ -639,6 +659,14 @@ function tickArena(){
         if(isQueen&&s.status==='active'){
           if(s.left<=180000&&s.left>0&&getNotif('qn_'+loc)){if(!queenAlertFired[loc]){queenAlertFired[loc]=true;playAlert(QUEEN_SOUNDS[loc]);}}
           else if(s.left>180000){queenAlertFired[loc]=false;}
+        }
+        if(isWD&&s.status==='active'){
+          if(s.left<=180000&&s.left>0&&getNotif('wd_'+loc)){if(!wdAlertFired[loc]){wdAlertFired[loc]=true;playAlert(WD_SOUNDS[loc]);}}
+          else if(s.left>180000){wdAlertFired[loc]=false;}
+        }
+        if(isHH&&s.status==='active'){
+          if(s.left<=180000&&s.left>0&&getNotif('hh_'+loc)){if(!hhAlertFired[loc]){hhAlertFired[loc]=true;playAlert(HH_SOUNDS[loc]);}}
+          else if(s.left>180000){hhAlertFired[loc]=false;}
         }
       });
     }
