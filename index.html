@@ -269,6 +269,8 @@ function getBS(id,min){
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
+function getNotif(id){return localStorage.getItem(id+'_notif')!=='off';}
+
 const FORTRESS=[
   {id:'kd_morning', name:'Kanturu Domination', sub:'Morning',  hour:14, minute:30},
   {id:'lf',         name:'Lorencia Fortress',  sub:'',         hour:18, minute:0 },
