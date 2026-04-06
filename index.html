@@ -222,6 +222,9 @@ const ARENA_BOSSES=[
 function makeId(name,prefix){return prefix+'_'+name.toLowerCase().replace(/[^a-z0-9]/g,'_');}
 
 let state={};
+let serverTimeOffset=0; // разница между временем сервера и локальным
+
+function now(){return Date.now()+serverTimeOffset;}
 let currentUser='Unknown';
 let activityLog=[];
 
@@ -302,7 +305,8 @@ function getNextEv(ev){
 function getBS(id,min){
   if(min<0)return{status:'fixed',left:getFixedMs(21)};
   const s=state[id];if(!s)return{status:'idle',left:0};
-  const left=min*60000-(Date.now()-s.startedAt);
+  const nowTs=now();
+  const left=min*60000-(nowTs-s.startedAt);
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
@@ -357,7 +361,7 @@ const MEMBERS=[
   {password:'paramon',  name:'Paramon',  greeting:'ЗДАРОВА ЗАЕБАЛ'},
   {password:'problema', name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
   {password:'junior',   name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
-  {password:'osteo1',   name:'Osteo',    greeting:'ШО ТИ, ЛИСИЙ?'},
+  {password:'osteo1',   name:'Artem',    greeting:'ШО ТИ, ЛИСИЙ?'},
 ];
 
 function checkPass(){
@@ -581,7 +585,7 @@ async function toggleBoss(id,min){
   const{status}=getBS(id,min);
   const action=status==='active'?'сбросил':'запустил';
   const bossName=BOSS_GROUPS.flatMap(g=>g.bosses).find(b=>b.id===id)?.name||id;
-  if(status==='active')delete state[id];else state[id]={startedAt:Date.now()};
+  if(status==='active')delete state[id];else state[id]={startedAt:now()};
   addLog(`${currentUser} — ${action} таймер: ${bossName}`);
   renderBosses();await saveState();
 }
@@ -592,7 +596,7 @@ async function toggleArena(key,min){
   const parts=key.split('_');
   const bossName=ARENA_BOSSES.find(b=>makeId(b.name,'a')===parts.slice(0,-1).join('_'))?.name||key;
   const loc=parts[parts.length-1].toUpperCase();
-  if(status==='active')delete state[key];else state[key]={startedAt:Date.now()};
+  if(status==='active')delete state[key];else state[key]={startedAt:now()};
   addLog(`${currentUser} — ${action} таймер: ${bossName} / ${loc}`);
   renderArena();await saveState();
 }
@@ -612,7 +616,16 @@ function renderLog(){
 
 async function loadState(){
   try{
+    const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    const fetchEnd=Date.now();
+    // Синхронизируем время с сервером
+    const serverDate=r.headers.get('date');
+    if(serverDate){
+      const serverTs=new Date(serverDate).getTime();
+      const latency=Math.round((fetchEnd-fetchStart)/2);
+      serverTimeOffset=serverTs+latency-fetchEnd;
+    }
     const d=await r.json();
     state=d.record.bosses||{};
     const newLog=d.record.log||[];
@@ -642,7 +655,7 @@ async function init(){
   await loadState();
   renderEvents();renderBosses();renderArena();renderLog();renderFortress();
   setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();},1000);
-  setInterval(async()=>{await loadState();},15000);
+  setInterval(async()=>{await loadState();},5000);
 }
 updateSrvTime();init();
 </script>
