@@ -392,14 +392,16 @@ function playAlert(file){
   try{new Audio(file).play();}catch(e){}
 }
 
-const alertFired={bc:false,cc:false,ds:false};
+const SOUND_MAP={bc:'bc.mp3',cc:'cc.mp3',ds:'ds.mp3',ww:'ww.mp3',tdm1:'tdm.mp3',tdm2:'tdm.mp3',col:'col.mp3',gd:'gd.mp3',rd:'rd.mp3',rb:'rabbits.mp3'};
+const ALERT_IDS=Object.keys(SOUND_MAP);
+const alertFired={}; ALERT_IDS.forEach(id=>alertFired[id]=false);
 
 function renderEvents(){
   document.getElementById('eventList').innerHTML=EVENTS.map(ev=>{
     const{msLeft,isOpen}=getNextEv(ev);
     const soon=msLeft<5*60000&&!isOpen;
     const cls=isOpen?'open':soon?'soon':'';
-    const hasAlert=['bc','cc','ds'].includes(ev.id);
+    const hasAlert=ALERT_IDS.includes(ev.id);
     const on=hasAlert?getNotif(ev.id):false;
     const nb=hasAlert?`<button id="${ev.id}-notif-btn" class="notif-btn ${on?'on':'off'}" onclick="toggleNotif('${ev.id}')" title="Sound alert">&#9836;</button>`:'';
     return`<div class="ev-item">${nb}<div class="ev-name">${ev.name}</div><div class="ev-timer ${cls}" id="et-${ev.id}">${isOpen?'OPEN':fmt(msLeft)}</div></div>`;
@@ -456,9 +458,9 @@ function tickEvents(){
     const soon=msLeft<5*60000&&!isOpen;
     el.textContent=isOpen?'OPEN':fmt(msLeft);
     el.className='ev-timer'+(isOpen?' open':soon?' soon':'');
-    if(['bc','cc','ds'].includes(ev.id)&&soon&&!isOpen&&getNotif(ev.id)){
-      if(!alertFired[ev.id]){alertFired[ev.id]=true;playAlert(ev.id+'.mp3');}
-    } else if(['bc','cc','ds'].includes(ev.id)&&!soon){alertFired[ev.id]=false;}
+    if(ALERT_IDS.includes(ev.id)&&soon&&!isOpen&&getNotif(ev.id)){
+      if(!alertFired[ev.id]){alertFired[ev.id]=true;playAlert(SOUND_MAP[ev.id]);}
+    } else if(ALERT_IDS.includes(ev.id)&&!soon){alertFired[ev.id]=false;}
   });
 }
 
