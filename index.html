@@ -191,7 +191,6 @@ const ARENA_BOSSES=[
 function makeId(name,prefix){return prefix+'_'+name.toLowerCase().replace(/[^a-z0-9]/g,'_');}
 
 let state={};
-let bcAlertFired=false;
 
 function getSrv(){return new Date(Date.now()+3*3600000);}
 
@@ -241,27 +240,27 @@ function getBS(id,min){
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
-function getBCNotif(){return localStorage.getItem('bc_notif')!=='off';}
-function toggleBCNotif(){
-  const on=getBCNotif();localStorage.setItem('bc_notif',on?'off':'on');
-  const b=document.getElementById('bc-notif-btn');
+function getNotif(id){return localStorage.getItem(id+'_notif')!=='off';}
+function toggleNotif(id){
+  const on=getNotif(id);localStorage.setItem(id+'_notif',on?'off':'on');
+  const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
 }
 
-function playAlert(){
-  try{
-    const audio = new Audio('bc.mp3');
-    audio.play();
-  }catch(e){}
+function playAlert(file){
+  try{new Audio(file).play();}catch(e){}
 }
 
+const alertFired={bc:false,cc:false,ds:false};
+
 function renderEvents(){
-  const on=getBCNotif();
   document.getElementById('eventList').innerHTML=EVENTS.map(ev=>{
     const{msLeft,isOpen}=getNextEv(ev);
     const soon=msLeft<5*60000&&!isOpen;
     const cls=isOpen?'open':soon?'soon':'';
-    const nb=ev.id==='bc'?`<button id="bc-notif-btn" class="notif-btn ${on?'on':'off'}" onclick="toggleBCNotif()" title="Sound alert">&#9836;</button>`:'';
+    const hasAlert=['bc','cc','ds'].includes(ev.id);
+    const on=hasAlert?getNotif(ev.id):false;
+    const nb=hasAlert?`<button id="${ev.id}-notif-btn" class="notif-btn ${on?'on':'off'}" onclick="toggleNotif('${ev.id}')" title="Sound alert">&#9836;</button>`:'';
     return`<div class="ev-item">${nb}<div class="ev-name">${ev.name}</div><div class="ev-timer ${cls}" id="et-${ev.id}">${isOpen?'OPEN':fmt(msLeft)}</div></div>`;
   }).join('');
 }
@@ -316,8 +315,9 @@ function tickEvents(){
     const soon=msLeft<5*60000&&!isOpen;
     el.textContent=isOpen?'OPEN':fmt(msLeft);
     el.className='ev-timer'+(isOpen?' open':soon?' soon':'');
-    if(ev.id==='bc'&&soon&&!isOpen&&getBCNotif()){if(!bcAlertFired){bcAlertFired=true;playAlert();}}
-    else if(ev.id==='bc'&&!soon){bcAlertFired=false;}
+    if(['bc','cc','ds'].includes(ev.id)&&soon&&!isOpen&&getNotif(ev.id)){
+      if(!alertFired[ev.id]){alertFired[ev.id]=true;playAlert(ev.id+'.mp3');}
+    } else if(['bc','cc','ds'].includes(ev.id)&&!soon){alertFired[ev.id]=false;}
   });
 }
 
