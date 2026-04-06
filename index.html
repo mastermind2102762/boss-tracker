@@ -139,6 +139,11 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
   <div class="dot" id="statusDot"></div>
   <span id="statusText">Подключение...</span>
 </div>
+
+<div class="panel" style="margin-top:14px;">
+  <div class="ptitle">Activity Log</div>
+  <div id="activityLog" style="max-height:160px;overflow-y:auto;"></div>
+</div>
 </div>
 
 <script>
@@ -209,6 +214,8 @@ const ARENA_BOSSES=[
 function makeId(name,prefix){return prefix+'_'+name.toLowerCase().replace(/[^a-z0-9]/g,'_');}
 
 let state={};
+let currentUser='Unknown';
+let activityLog=[];
 
 function getSrv(){return new Date(Date.now()+3*3600000);}
 
@@ -279,6 +286,7 @@ function checkPass(){
   if(member){
     msg.style.color='#52c878';
     msg.textContent=member.greeting;
+    currentUser=member.name;
     unlockAudio();
     setTimeout(()=>{ document.getElementById('modal').style.display='none'; }, 1500);
   } else {
@@ -413,26 +421,52 @@ function tickArena(){
 
 async function toggleBoss(id,min){
   const{status}=getBS(id,min);
+  const action=status==='active'?'сбросил':'запустил';
+  const bossName=BOSS_GROUPS.flatMap(g=>g.bosses).find(b=>b.id===id)?.name||id;
   if(status==='active')delete state[id];else state[id]={startedAt:Date.now()};
+  addLog(`${currentUser} — ${action} таймер: ${bossName}`);
   renderBosses();await saveState();
 }
 async function toggleArena(key,min){
   if(min<0)return;
   const{status}=getBS(key,min);
+  const action=status==='active'?'сбросил':'запустил';
+  const parts=key.split('_');
+  const bossName=ARENA_BOSSES.find(b=>makeId(b.name,'a')===parts.slice(0,-1).join('_'))?.name||key;
+  const loc=parts[parts.length-1].toUpperCase();
   if(status==='active')delete state[key];else state[key]={startedAt:Date.now()};
+  addLog(`${currentUser} — ${action} таймер: ${bossName} / ${loc}`);
   renderArena();await saveState();
+}
+
+function addLog(msg){
+  const t=getSrv();
+  const time=[t.getUTCHours(),t.getUTCMinutes(),t.getUTCSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+  activityLog.unshift(`[${time}] ${msg}`);
+  if(activityLog.length>50)activityLog.pop();
+  renderLog();
+}
+
+function renderLog(){
+  const el=document.getElementById('activityLog');if(!el)return;
+  el.innerHTML=activityLog.map(l=>`<div style="padding:3px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);">${l}</div>`).join('');
 }
 
 async function loadState(){
   try{
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
-    const d=await r.json();state=d.record.bosses||{};
+    const d=await r.json();
+    state=d.record.bosses||{};
+    const newLog=d.record.log||[];
+    if(JSON.stringify(newLog)!==JSON.stringify(activityLog)){
+      activityLog=newLog;renderLog();
+    }
     setStatus(true,'Синхронизировано');
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
 async function saveState(){
   try{
-    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify({bosses:state})});
+    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify({bosses:state,log:activityLog})});
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
   }catch(e){setStatus(false,'Ошибка сохранения');}
 }
@@ -448,7 +482,7 @@ function updateSrvTime(){
 
 async function init(){
   await loadState();
-  renderEvents();renderBosses();renderArena();
+  renderEvents();renderBosses();renderArena();renderLog();
   setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();},1000);
   setInterval(async()=>{await loadState();},15000);
 }
