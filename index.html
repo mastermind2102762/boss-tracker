@@ -9,7 +9,6 @@
   :root {
     --bg: #0a0c10;
     --surface: #111318;
-    --surface2: #1a1d24;
     --border: #2a2d36;
     --accent: #c8a84b;
     --text: #e8e6e0;
@@ -19,161 +18,98 @@
     --warning: #e09652;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; padding: 1.5rem 1rem; }
 
-  .container { max-width: 1100px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 1.5rem; }
+  .logo { font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .divider { width: 50px; height: 2px; background: var(--accent); margin: 10px auto; }
+  .server-time { font-family: 'Share Tech Mono', monospace; font-size: 20px; color: var(--accent); letter-spacing: 3px; margin: 4px 0; }
 
-  header { text-align: center; margin-bottom: 2rem; }
-  .logo { font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
-  h1 { font-size: 34px; font-weight: 700; letter-spacing: 2px; color: var(--text); text-transform: uppercase; }
-  .divider { width: 60px; height: 2px; background: var(--accent); margin: 12px auto; }
-  .server-time { font-family: 'Share Tech Mono', monospace; font-size: 22px; color: var(--accent); letter-spacing: 3px; margin: 6px 0 4px; }
-  .subtitle { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+  .layout { display: grid; grid-template-columns: 200px 220px 1fr; gap: 14px; align-items: start; }
 
-  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
-  @media(max-width: 700px) { .layout { grid-template-columns: 1fr; } }
-
-  .section-title {
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
+  .panel-title { font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 
   /* EVENTS */
-  .event-list { display: flex; flex-direction: column; gap: 8px; }
-  .event-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .event-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--border);
-    transition: background 0.3s;
-  }
-  .event-card.soon::before { background: var(--warning); }
-  .event-card.open::before { background: var(--success); animation: pulse 1s infinite; }
-  .event-name { font-size: 15px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-  .event-schedule { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-  .event-timer {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 18px;
-    letter-spacing: 1px;
-    color: var(--muted);
-    text-align: right;
-  }
+  .event-item { padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .event-item:last-child { border-bottom: none; }
+  .event-name { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .event-timer { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--muted); }
   .event-timer.soon { color: var(--warning); }
-  .event-timer.open { color: var(--success); }
-  .event-next { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; text-align: right; }
+  .event-timer.open { color: var(--success); animation: pulse 1s infinite; }
 
   /* BOSSES */
-  .boss-list { display: flex; flex-direction: column; gap: 10px; }
-  .boss-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1rem 1.25rem;
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 1.25rem;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .boss-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--border);
-    transition: background 0.3s;
-  }
-  .boss-card.active::before { background: var(--danger); }
-  .boss-card.active { border-color: #2a1a1a; }
-  .boss-card.ready::before { background: var(--success); }
-  .boss-card.ready { border-color: #1a2a1a; }
-  .boss-name { font-size: 18px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-  .boss-meta { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-  .boss-meta span { color: var(--accent); }
-  .timer-block { text-align: center; }
-  .timer { font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 2px; color: var(--muted); transition: color 0.3s; }
-  .timer.active { color: var(--danger); }
-  .timer.ready { color: var(--success); animation: pulse 1s infinite; }
-  .timer-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
-  .btn {
-    padding: 8px 16px;
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .btn:hover { background: var(--accent); color: var(--bg); }
-  .btn:active { transform: scale(0.97); }
-  .btn.running { border-color: var(--danger); color: var(--danger); }
-  .btn.running:hover { background: var(--danger); color: #fff; }
-  .btn.spawn { border-color: var(--success); color: var(--success); }
-  .btn.spawn:hover { background: var(--success); color: var(--bg); }
-  .started-by { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 4px; text-align: right; }
+  .boss-group { margin-bottom: 12px; }
+  .boss-group:last-child { margin-bottom: 0; }
+  .boss-group-name { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .boss-item { padding: 6px 8px; margin-bottom: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
+  .boss-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--border); transition: background 0.3s; }
+  .boss-item.active::before { background: var(--danger); }
+  .boss-item.ready::before { background: var(--success); }
+  .boss-item:hover { border-color: var(--accent); }
+  .boss-item-name { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .boss-item-timer { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--muted); }
+  .boss-item-timer.active { color: var(--danger); }
+  .boss-item-timer.ready { color: var(--success); animation: pulse 1s infinite; }
 
-  .status-bar {
-    display: flex; align-items: center; gap: 8px;
-    margin-top: 1.5rem; padding: 10px 16px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-    font-size: 12px; color: var(--muted); letter-spacing: 1px;
-  }
+  /* LOCATIONS TABLE */
+  .loc-table { width: 100%; border-collapse: collapse; }
+  .loc-table th { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  .loc-table th.boss-col { text-align: left; }
+  .loc-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .loc-table tr:last-child td { border-bottom: none; }
+  .loc-name { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .loc-respawn { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+  .loc-cell { text-align: center; }
+  .loc-timer { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--muted); cursor: pointer; padding: 4px 6px; border-radius: 3px; border: 1px solid transparent; transition: all 0.2s; display: inline-block; min-width: 70px; }
+  .loc-timer:hover { border-color: var(--accent); color: var(--accent); }
+  .loc-timer.active { color: var(--danger); border-color: #2a1a1a; }
+  .loc-timer.ready { color: var(--success); animation: pulse 1s infinite; }
+
+  .status-bar { display: flex; align-items: center; gap: 8px; margin-top: 1rem; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
   .dot.error { background: var(--danger); }
-  .loading { text-align: center; padding: 3rem; color: var(--muted); font-size: 14px; letter-spacing: 2px; }
 
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 </style>
 </head>
 <body>
-<div class="container">
+<div style="max-width:1200px;margin:0 auto;">
   <header>
     <div class="logo">Guild Tool</div>
     <h1>Boss Tracker by Kabal</h1>
     <div class="divider"></div>
     <div class="server-time">Server time: <span id="serverTime">--:--:--</span></div>
-    <div class="subtitle">Синхронизированный трекер респауна боссов</div>
   </header>
 
   <div class="layout">
-    <div>
-      <div class="section-title">Events</div>
-      <div class="event-list" id="eventList"></div>
+    <!-- EVENTS -->
+    <div class="panel">
+      <div class="panel-title">Events</div>
+      <div id="eventList"></div>
     </div>
-    <div>
-      <div class="section-title">Boss respawn</div>
-      <div id="app"><div class="loading">Загрузка...</div></div>
+
+    <!-- BOSSES -->
+    <div class="panel">
+      <div class="panel-title">Bosses</div>
+      <div id="bossList"></div>
+    </div>
+
+    <!-- LOCATIONS -->
+    <div class="panel">
+      <div class="panel-title">VIP Arena</div>
+      <table class="loc-table">
+        <thead>
+          <tr>
+            <th class="boss-col">Boss</th>
+            <th>Main</th>
+            <th>Sub1</th>
+            <th>Sub2</th>
+          </tr>
+        </thead>
+        <tbody id="locTable"></tbody>
+      </table>
     </div>
   </div>
 
@@ -188,157 +124,210 @@ const BIN_ID = '69d30e0daaba882197ca5cb3';
 const API_KEY = '$2a$10$WcKd4x3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
 const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-const BOSSES = [
-  { id: 'zaikan',   name: 'Zaikan',         hours: 5 },
-  { id: 'darkelf',  name: 'Dark Elf',        hours: 1 },
-  { id: 'tantalos', name: 'Golden Tantalos', hours: 2 },
+const EVENTS = [
+  { id: 'bc',  name: 'Blood Castle',   type: 'hourly',    minute: 25, duration: 15 },
+  { id: 'cc',  name: 'Chaos Castle',   type: 'alternate', minute: 55, duration: 10, parity: 'even' },
+  { id: 'ds',  name: 'Devil Square',   type: 'alternate', minute: 55, duration: 10, parity: 'odd'  },
+  { id: 'rb',  name: 'Rabbits',        type: 'hourly',    minute: 0,  duration: 10 },
+  { id: 'ww',  name: 'White Wizards',  type: 'hourly',    minute: 30, duration: 10 },
+  { id: 'gd',  name: 'Golden Dragons', type: 'hourly',    minute: 0,  duration: 10 },
+  { id: 'rd',  name: 'Red Dragons',    type: 'hourly',    minute: 0,  duration: 10 },
+  { id: 'hh',  name: 'Happy Hour',     type: 'hourly',    minute: 0,  duration: 60 },
+  { id: 'tdm', name: 'Team Deathmatch',type: 'hourly',    minute: 0,  duration: 30 },
 ];
 
-// Events — расписание по серверному времени UTC+3
-// type: 'hourly' — каждый час в minute
-// type: 'alternate' — чередуются каждые 2 часа в minute, startEven=true значит в чётные часы первый
-const EVENTS = [
+const BOSS_GROUPS = [
   {
-    id: 'bc',
-    name: 'Blood Castle',
-    schedule: 'Каждый час в :25',
-    type: 'hourly',
-    minute: 25,
-    duration: 15
+    name: 'Zaikan Tarkan',
+    bosses: [
+      { id: 'zaikan_tarkan_main', name: 'Main',  hours: 5 },
+      { id: 'zaikan_tarkan_sub1', name: 'Sub1',  hours: 5 },
+      { id: 'zaikan_tarkan_sub2', name: 'Sub2',  hours: 5 },
+    ]
   },
   {
-    id: 'cc',
-    name: 'Chaos Castle',
-    schedule: 'Каждые 2ч в :55 (чётные часы)',
-    type: 'alternate',
-    minute: 55,
-    duration: 10,
-    parity: 'even'
+    name: 'Zaikan Lorencia',
+    bosses: [
+      { id: 'zaikan_lor', name: 'Lorencia', hours: 5 },
+    ]
   },
   {
-    id: 'ds',
-    name: 'Devil Square',
-    schedule: 'Каждые 2ч в :55 (нечётные часы)',
-    type: 'alternate',
-    minute: 55,
-    duration: 10,
-    parity: 'odd'
+    name: 'Dark Elf',
+    bosses: [
+      { id: 'dark_elf', name: 'Dark Elf', hours: 1 },
+    ]
   },
 ];
+
+const VIP_BOSSES = [
+  { id: 'fortune_pouch', name: 'Fortune Pouch', respawnMin: 30 },
+  { id: 'soldier',       name: 'Soldier',       respawnMin: 30 },
+  { id: 'hammer_head',   name: 'Hammer Head',   respawnMin: 240 },
+];
+const VIP_LOCS = ['main', 'sub1', 'sub2'];
 
 let state = {};
-let tickInterval = null;
 
 function getServerTime() {
-  const now = new Date();
-  return new Date(now.getTime() + 3 * 3600 * 1000);
+  return new Date(Date.now() + 3 * 3600 * 1000);
 }
 
 function fmt(ms) {
   if (ms <= 0) return '00:00:00';
   const s = Math.floor(ms / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  return [h,m,sec].map(x => String(x).padStart(2,'0')).join(':');
+  return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60].map(x=>String(x).padStart(2,'0')).join(':');
 }
 
-function fmtHM(h, m) {
-  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+function fmtMin(ms) {
+  if (ms <= 0) return '00:00';
+  const s = Math.floor(ms / 1000);
+  return [Math.floor(s/60), s%60].map(x=>String(x).padStart(2,'0')).join(':');
 }
 
 function getNextEvent(ev) {
-  const now = getServerTime();
-  const h = now.getUTCHours();
-  const m = now.getUTCMinutes();
-  const s = now.getUTCSeconds();
-
-  let nextH, nextM = ev.minute;
-
+  const t = getServerTime();
+  const h = t.getUTCHours(), m = t.getUTCMinutes(), s = t.getUTCSeconds();
+  const nowMs = h*3600000 + m*60000 + s*1000;
+  let nextH;
   if (ev.type === 'hourly') {
-    if (m < ev.minute || (m === ev.minute && s === 0)) {
-      nextH = h;
-    } else {
-      nextH = h + 1;
-    }
+    nextH = m < ev.minute || (m === ev.minute && s === 0) ? h : h + 1;
   } else {
-    // alternate: чётные или нечётные часы
-    const isEven = (hh) => hh % 2 === 0;
-    const matches = ev.parity === 'even' ? isEven : (hh) => !isEven(hh);
-    let candidate = h;
-    if (!matches(candidate) || m > ev.minute || (m === ev.minute && s > 0)) {
-      candidate++;
-    }
-    while (!matches(candidate)) candidate++;
-    nextH = candidate;
+    const match = ev.parity === 'even' ? hh=>hh%2===0 : hh=>hh%2!==0;
+    let c = h;
+    if (!match(c) || m > ev.minute || (m === ev.minute && s > 0)) c++;
+    while (!match(c)) c++;
+    nextH = c;
   }
-
   nextH = nextH % 24;
-  const nowMs = now.getUTCHours() * 3600000 + now.getUTCMinutes() * 60000 + now.getUTCSeconds() * 1000;
-  let nextMs = nextH * 3600000 + nextM * 60000;
-  if (nextMs <= nowMs) nextMs += 24 * 3600000;
+  let nextMs = nextH*3600000 + ev.minute*60000;
+  if (nextMs <= nowMs) nextMs += 86400000;
   const msLeft = nextMs - nowMs;
-
-  // Проверяем открыт ли ивент прямо сейчас
-  const openStart = nextMs - msLeft; // это и есть nowMs если открыт
-  const eventNowMs = h * 3600000 + m * 60000 + s * 1000;
   let isOpen = false;
-
   if (ev.type === 'hourly') {
-    const startMs = h * 3600000 + ev.minute * 60000;
-    const endMs = startMs + ev.duration * 60000;
-    isOpen = eventNowMs >= startMs && eventNowMs < endMs;
+    const st = h*3600000 + ev.minute*60000;
+    isOpen = nowMs >= st && nowMs < st + ev.duration*60000;
   } else {
-    const matches = ev.parity === 'even' ? (hh) => hh % 2 === 0 : (hh) => hh % 2 !== 0;
-    if (matches(h)) {
-      const startMs = h * 3600000 + ev.minute * 60000;
-      const endMs = startMs + ev.duration * 60000;
-      isOpen = eventNowMs >= startMs && eventNowMs < endMs;
-    }
+    const match = ev.parity === 'even' ? hh=>hh%2===0 : hh=>hh%2!==0;
+    if (match(h)) { const st = h*3600000 + ev.minute*60000; isOpen = nowMs >= st && nowMs < st + ev.duration*60000; }
   }
-
-  return { msLeft, nextH, nextM, isOpen };
+  return { msLeft, isOpen };
 }
 
 function renderEvents() {
-  const list = document.getElementById('eventList');
-  list.innerHTML = EVENTS.map(ev => {
-    const { msLeft, nextH, nextM, isOpen } = getNextEvent(ev);
-    const soon = msLeft < 5 * 60 * 1000 && !isOpen;
+  document.getElementById('eventList').innerHTML = EVENTS.map(ev => {
+    const { msLeft, isOpen } = getNextEvent(ev);
+    const soon = msLeft < 5*60000 && !isOpen;
     const cls = isOpen ? 'open' : soon ? 'soon' : '';
-    const timerText = isOpen ? 'OPEN!' : fmt(msLeft);
-    const timerCls = isOpen ? 'open' : soon ? 'soon' : '';
-    return `
-      <div class="event-card ${cls}" id="ecard-${ev.id}">
-        <div>
-          <div class="event-name">${ev.name}</div>
-          <div class="event-schedule">${ev.schedule}</div>
-        </div>
-        <div>
-          <div class="event-timer ${timerCls}" id="etimer-${ev.id}">${timerText}</div>
-          <div class="event-next" id="enext-${ev.id}">${isOpen ? 'Идёт сейчас' : 'в ' + fmtHM(nextH, nextM)}</div>
-        </div>
-      </div>
-    `;
+    const txt = isOpen ? 'OPEN' : fmt(msLeft);
+    return `<div class="event-item">
+      <div class="event-name">${ev.name}</div>
+      <div class="event-timer ${cls}" id="et-${ev.id}">${txt}</div>
+    </div>`;
   }).join('');
 }
 
 function tickEvents() {
   EVENTS.forEach(ev => {
-    const { msLeft, nextH, nextM, isOpen } = getNextEvent(ev);
-    const soon = msLeft < 5 * 60 * 1000 && !isOpen;
-    const el = document.getElementById('etimer-' + ev.id);
-    const card = document.getElementById('ecard-' + ev.id);
-    const next = document.getElementById('enext-' + ev.id);
+    const { msLeft, isOpen } = getNextEvent(ev);
+    const el = document.getElementById('et-' + ev.id);
     if (!el) return;
-    el.textContent = isOpen ? 'OPEN!' : fmt(msLeft);
+    const soon = msLeft < 5*60000 && !isOpen;
+    el.textContent = isOpen ? 'OPEN' : fmt(msLeft);
     el.className = 'event-timer' + (isOpen ? ' open' : soon ? ' soon' : '');
-    card.className = 'event-card' + (isOpen ? ' open' : soon ? ' soon' : '');
-    if (next) next.textContent = isOpen ? 'Идёт сейчас' : 'в ' + fmtHM(nextH, nextM);
   });
 }
 
-// BOSSES
+function renderBosses() {
+  document.getElementById('bossList').innerHTML = BOSS_GROUPS.map(g => `
+    <div class="boss-group">
+      <div class="boss-group-name">${g.name}</div>
+      ${g.bosses.map(b => {
+        const s = state[b.id];
+        const elapsed = s ? Date.now() - s.startedAt : null;
+        const total = b.hours * 3600000;
+        const left = elapsed !== null ? total - elapsed : null;
+        const status = left === null ? 'idle' : left > 0 ? 'active' : 'ready';
+        const txt = status === 'idle' ? '--:--:--' : status === 'ready' ? 'READY' : fmt(left);
+        return `<div class="boss-item ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}', ${b.hours})">
+          <div class="boss-item-name">${b.name}</div>
+          <div class="boss-item-timer ${status === 'idle' ? '' : status}" id="bt-${b.id}">${txt}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+function renderLocTable() {
+  document.getElementById('locTable').innerHTML = VIP_BOSSES.map(b => `
+    <tr>
+      <td>
+        <div class="loc-name">${b.name}</div>
+        <div class="loc-respawn">${b.respawnMin >= 60 ? (b.respawnMin/60)+'h' : b.respawnMin+'min'}</div>
+      </td>
+      ${VIP_LOCS.map(loc => {
+        const key = b.id + '_' + loc;
+        const s = state[key];
+        const elapsed = s ? Date.now() - s.startedAt : null;
+        const total = b.respawnMin * 60000;
+        const left = elapsed !== null ? total - elapsed : null;
+        const status = left === null ? 'idle' : left > 0 ? 'active' : 'ready';
+        const txt = status === 'idle' ? '——' : status === 'ready' ? 'READY' : fmtMin(left);
+        return `<td class="loc-cell">
+          <div class="loc-timer ${status === 'idle' ? '' : status}" id="lt-${key}" onclick="toggleLoc('${b.id}', '${loc}', ${b.respawnMin})">${txt}</div>
+        </td>`;
+      }).join('')}
+    </tr>
+  `).join('');
+}
+
+function tickBosses() {
+  BOSS_GROUPS.forEach(g => g.bosses.forEach(b => {
+    const s = state[b.id];
+    const el = document.getElementById('bt-' + b.id);
+    const card = document.getElementById('bi-' + b.id);
+    if (!el) return;
+    const elapsed = s ? Date.now() - s.startedAt : null;
+    const left = elapsed !== null ? b.hours*3600000 - elapsed : null;
+    const status = left === null ? 'idle' : left > 0 ? 'active' : 'ready';
+    el.textContent = status === 'idle' ? '--:--:--' : status === 'ready' ? 'READY' : fmt(left);
+    el.className = 'boss-item-timer' + (status === 'idle' ? '' : ' ' + status);
+    card.className = 'boss-item ' + status;
+  }));
+}
+
+function tickLoc() {
+  VIP_BOSSES.forEach(b => VIP_LOCS.forEach(loc => {
+    const key = b.id + '_' + loc;
+    const s = state[key];
+    const el = document.getElementById('lt-' + key);
+    if (!el) return;
+    const elapsed = s ? Date.now() - s.startedAt : null;
+    const left = elapsed !== null ? b.respawnMin*60000 - elapsed : null;
+    const status = left === null ? 'idle' : left > 0 ? 'active' : 'ready';
+    el.textContent = status === 'idle' ? '——' : status === 'ready' ? 'READY' : fmtMin(left);
+    el.className = 'loc-timer' + (status === 'idle' ? '' : ' ' + status);
+  }));
+}
+
+async function toggleBoss(id, hours) {
+  const s = state[id];
+  const elapsed = s ? Date.now() - s.startedAt : null;
+  const active = elapsed !== null && hours*3600000 - elapsed > 0;
+  if (active) delete state[id]; else state[id] = { startedAt: Date.now() };
+  renderBosses();
+  await saveState();
+}
+
+async function toggleLoc(bossId, loc, respawnMin) {
+  const key = bossId + '_' + loc;
+  const s = state[key];
+  const elapsed = s ? Date.now() - s.startedAt : null;
+  const active = elapsed !== null && respawnMin*60000 - elapsed > 0;
+  if (active) delete state[key]; else state[key] = { startedAt: Date.now() };
+  renderLocTable();
+  await saveState();
+}
+
 async function loadState() {
   try {
     const r = await fetch(API_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
@@ -364,84 +353,21 @@ function setStatus(ok, msg) {
   document.getElementById('statusText').textContent = msg;
 }
 
-function getCardState(boss) {
-  const s = state[boss.id];
-  if (!s || !s.startedAt) return { status: 'idle', timeLeft: 0 };
-  const elapsed = Date.now() - s.startedAt;
-  const total = boss.hours * 3600 * 1000;
-  const timeLeft = total - elapsed;
-  return { status: timeLeft > 0 ? 'active' : 'ready', timeLeft: Math.max(0, timeLeft), startedAt: s.startedAt };
-}
-
-function fmtDateTime(ts) {
-  if (!ts) return '';
-  return new Date(ts).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
-}
-
-function renderBosses() {
-  const app = document.getElementById('app');
-  app.innerHTML = '<div class="boss-list">' + BOSSES.map(boss => {
-    const { status, timeLeft, startedAt } = getCardState(boss);
-    const timerText = status === 'idle' ? '--:--:--' : status === 'ready' ? 'READY!' : fmt(timeLeft);
-    const label = status === 'idle' ? 'ожидание' : status === 'ready' ? 'spawned!' : 'respawn';
-    const btnText = status === 'active' ? 'Сбросить' : 'Убит';
-    const btnClass = 'btn' + (status === 'active' ? ' running' : status === 'ready' ? ' spawn' : '');
-    const startedInfo = startedAt ? 'Запущен в ' + fmtDateTime(startedAt) : '';
-    return `
-      <div class="boss-card ${status}" id="card-${boss.id}">
-        <div>
-          <div class="boss-name">${boss.name}</div>
-          <div class="boss-meta">Респаун: <span>${boss.hours}ч</span></div>
-        </div>
-        <div class="timer-block">
-          <div class="timer ${status === 'idle' ? '' : status}" id="timer-${boss.id}">${timerText}</div>
-          <div class="timer-label">${label}</div>
-        </div>
-        <div>
-          <button class="${btnClass}" onclick="toggleBoss('${boss.id}')">${btnText}</button>
-          <div class="started-by">${startedInfo}</div>
-        </div>
-      </div>`;
-  }).join('') + '</div>';
-}
-
-async function toggleBoss(id) {
-  const boss = BOSSES.find(b => b.id === id);
-  const { status } = getCardState(boss);
-  if (status === 'active') { delete state[id]; } else { state[id] = { startedAt: Date.now() }; }
-  renderBosses();
-  await saveState();
-}
-
-function tickBosses() {
-  BOSSES.forEach(boss => {
-    const { status, timeLeft } = getCardState(boss);
-    const el = document.getElementById('timer-' + boss.id);
-    const card = document.getElementById('card-' + boss.id);
-    if (!el) return;
-    if (status === 'active') { el.textContent = fmt(timeLeft); el.className = 'timer active'; card.className = 'boss-card active'; }
-    else if (status === 'ready') { el.textContent = 'READY!'; el.className = 'timer ready'; card.className = 'boss-card ready'; }
-  });
-}
-
 function updateServerTime() {
   const t = getServerTime();
   const h = String(t.getUTCHours()).padStart(2,'0');
   const m = String(t.getUTCMinutes()).padStart(2,'0');
   const s = String(t.getUTCSeconds()).padStart(2,'0');
-  document.getElementById('serverTime').textContent = h + ':' + m + ':' + s;
+  document.getElementById('serverTime').textContent = h+':'+m+':'+s;
 }
 
 async function init() {
   await loadState();
-  renderBosses();
   renderEvents();
-  setInterval(() => {
-    updateServerTime();
-    tickBosses();
-    tickEvents();
-  }, 1000);
-  setInterval(async () => { await loadState(); renderBosses(); }, 15000);
+  renderBosses();
+  renderLocTable();
+  setInterval(() => { updateServerTime(); tickEvents(); tickBosses(); tickLoc(); }, 1000);
+  setInterval(async () => { await loadState(); }, 15000);
 }
 
 updateServerTime();
