@@ -159,16 +159,16 @@ const EVENTS=[
   {id:'bc',  name:'Blood Castle',    type:'hourly',    minute:25, duration:5},
   {id:'cc',  name:'Chaos Castle',    type:'alternate', minute:55, duration:5, parity:'even'},
   {id:'ds',  name:'Devil Square',    type:'alternate', minute:55, duration:5, parity:'odd'},
-  {id:'rb',  name:'White Rabbits',   type:'fixed',     hour:13,   minute:47, duration:10},
+  {id:'rb',  name:'White Rabbits',   type:'fixed',     hour:13,   minute:47, duration:10, aliveLabel:'ALIVE',  aliveDuration:10},
   {id:'col', name:'Colloseum',       type:'fixed',     hour:9,    minute:20, duration:10},
-  {id:'rd',  name:'Red Dragon',      type:'fixedloop', hour:9,    minute:10, intervalH:2, duration:10},
-  {id:'gd',  name:'Golden Dragon',   type:'fixedloop', hour:9,    minute:15, intervalH:2, duration:10},
+  {id:'rd',  name:'Red Dragon',      type:'fixedloop', hour:9,    minute:10, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
+  {id:'gd',  name:'Golden Dragon',   type:'fixedloop', hour:9,    minute:15, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
   {id:'mt',  name:'Magic Treasure',  type:'fixedloop', hour:9,    minute:20, intervalH:2, duration:10},
   {id:'dk',  name:'Death King',      type:'fixed',     hour:8,    minute:50, duration:10},
   {id:'cd',  name:'Castle Deep',     type:'fixed',     hour:16,   minute:0,  duration:10},
-  {id:'tdm1',name:'Team Deathmatch', type:'fixed',     hour:14,   minute:0,  duration:30},
-  {id:'tdm2',name:'Team Deathmatch', type:'fixed',     hour:20,   minute:0,  duration:30},
+  {id:'tdm', name:'Team Deathmatch', type:'multifixed', times:[{hour:14,minute:0},{hour:20,minute:0}], duration:10, aliveLabel:'BATTLE', aliveDuration:10},
   {id:'hh',  name:'Happy Hour',      type:'hourly',    minute:0,  duration:60},
+  {id:'ww',  name:'White Wizards',   type:'hourly',    minute:30, duration:10},
 ];
 
 const BOSS_GROUPS=[
@@ -182,6 +182,12 @@ const BOSS_GROUPS=[
   ]},
   {name:'Dark Elf',bosses:[
     {id:'de',name:'Dark Elf',min:60},
+  ]},
+  {name:'Ancient Lord C',bosses:[
+    {id:'alc',name:'Ancient Lord C',min:180},
+  ]},
+  {name:'Cursed King',bosses:[
+    {id:'ck',name:'Cursed King',min:15},
   ]},
 ];
 
@@ -257,7 +263,7 @@ function getFixedMs(h){
 function getNextEv(ev){
   const t=getSrv(),h=t.getUTCHours(),m=t.getUTCMinutes(),s=t.getUTCSeconds();
   const nowMs=h*3600000+m*60000+s*1000;
-  let msLeft, isOpen=false;
+  let msLeft, isOpen=false, isAlive=false;
 
   if(ev.type==='hourly'){
     const nH=(m<ev.minute||(m===ev.minute&&s===0))?h:h+1;
@@ -281,25 +287,51 @@ function getNextEv(ev){
     let diff=target-nowMs;
     if(diff<=0)diff+=86400000;
     msLeft=diff;
-    isOpen=nowMs>=target&&nowMs<target+ev.duration*60000;
+    const elapsed=nowMs-target;
+    if(elapsed>=0&&elapsed<ev.duration*60000){
+      isOpen=true;
+      if(ev.aliveDuration&&elapsed<ev.aliveDuration*60000)isAlive=true;
+    }
 
   } else if(ev.type==='fixedloop'){
-    // starts at ev.hour:ev.minute then every intervalH hours
     const startMs=ev.hour*3600000+ev.minute*60000;
     const interval=ev.intervalH*3600000;
-    // find next occurrence
     let next=startMs;
-    while(next<=nowMs) next+=interval;
+    while(next<=nowMs)next+=interval;
     msLeft=next-nowMs;
-    // check if currently open
     let check=startMs;
     while(check<=nowMs){
-      if(nowMs>=check&&nowMs<check+ev.duration*60000){isOpen=true;break;}
+      const elapsed=nowMs-check;
+      if(elapsed>=0&&elapsed<ev.duration*60000){
+        isOpen=true;
+        if(ev.aliveDuration&&elapsed<ev.aliveDuration*60000)isAlive=true;
+        break;
+      }
       check+=interval;
     }
+
+  } else if(ev.type==='multifixed'){
+    let minDiff=86400000;
+    ev.times.forEach(({hour,minute})=>{
+      const target=hour*3600000+minute*60000;
+      let diff=target-nowMs;
+      if(diff<=0)diff+=86400000;
+      if(diff<minDiff)minDiff=diff;
+      const elapsed=nowMs-target;
+      if(elapsed>=0&&elapsed<ev.duration*60000){
+        isOpen=true;
+        if(ev.aliveDuration&&elapsed<ev.aliveDuration*60000)isAlive=true;
+      }
+      const elapsedYest=nowMs-(target-86400000);
+      if(elapsedYest>=0&&elapsedYest<ev.duration*60000){
+        isOpen=true;
+        if(ev.aliveDuration&&elapsedYest<ev.aliveDuration*60000)isAlive=true;
+      }
+    });
+    msLeft=minDiff;
   }
 
-  return{msLeft,isOpen};
+  return{msLeft,isOpen,isAlive};
 }
 
 function getBS(id,min){
@@ -399,19 +431,20 @@ function playAlert(file){
   try{new Audio(file).play();}catch(e){}
 }
 
-const SOUND_MAP={bc:'bc.mp3',cc:'cc.mp3',ds:'ds.mp3',ww:'ww.mp3',tdm1:'tdm.mp3',tdm2:'tdm.mp3',col:'col.mp3',gd:'gd.mp3',rd:'rd.mp3',rb:'rabbits.mp3'};
+const SOUND_MAP={bc:'bc.mp3',cc:'cc.mp3',ds:'ds.mp3',ww:'ww.mp3',tdm:'tdm.mp3',col:'col.mp3',gd:'gd.mp3',rd:'rd.mp3',rb:'rabbits.mp3'};
 const ALERT_IDS=Object.keys(SOUND_MAP);
 const alertFired={}; ALERT_IDS.forEach(id=>alertFired[id]=false);
 
 function renderEvents(){
   document.getElementById('eventList').innerHTML=EVENTS.map(ev=>{
-    const{msLeft,isOpen}=getNextEv(ev);
+    const{msLeft,isOpen,isAlive}=getNextEv(ev);
     const soon=msLeft<5*60000&&!isOpen;
     const cls=isOpen?'open':soon?'soon':'';
+    const txt=isAlive?(ev.aliveLabel||'ALIVE'):isOpen?'OPEN':fmt(msLeft);
     const hasAlert=ALERT_IDS.includes(ev.id);
     const on=hasAlert?getNotif(ev.id):false;
     const nb=hasAlert?`<button id="${ev.id}-notif-btn" class="notif-btn ${on?'on':'off'}" onclick="toggleNotif('${ev.id}')" title="Sound alert">&#9836;</button>`:'';
-    return`<div class="ev-item">${nb}<div class="ev-name">${ev.name}</div><div class="ev-timer ${cls}" id="et-${ev.id}">${isOpen?'OPEN':fmt(msLeft)}</div></div>`;
+    return`<div class="ev-item">${nb}<div class="ev-name">${ev.name}</div><div class="ev-timer ${cls}" id="et-${ev.id}">${txt}</div></div>`;
   }).join('');
 }
 
@@ -476,10 +509,10 @@ function renderArena(){
 
 function tickEvents(){
   EVENTS.forEach(ev=>{
-    const{msLeft,isOpen}=getNextEv(ev);
+    const{msLeft,isOpen,isAlive}=getNextEv(ev);
     const el=document.getElementById('et-'+ev.id);if(!el)return;
     const soon=msLeft<5*60000&&!isOpen;
-    el.textContent=isOpen?'OPEN':fmt(msLeft);
+    el.textContent=isAlive?(ev.aliveLabel||'ALIVE'):isOpen?'OPEN':fmt(msLeft);
     el.className='ev-timer'+(isOpen?' open':soon?' soon':'');
     if(ALERT_IDS.includes(ev.id)&&soon&&!isOpen&&getNotif(ev.id)){
       if(!alertFired[ev.id]){alertFired[ev.id]=true;playAlert(SOUND_MAP[ev.id]);}
