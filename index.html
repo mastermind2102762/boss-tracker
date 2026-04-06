@@ -269,7 +269,7 @@ function tickBosses() {
     const card=document.getElementById('bi-'+b.id);
     if(!el)return;
     el.textContent=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
-    el.className='boss-item-timer'+(status==='idle'?':'+' '+status);
+    el.className='boss-item-timer'+(status==='idle'?'':' '+status);
     card.className='boss-item '+status;
   }));
 }
