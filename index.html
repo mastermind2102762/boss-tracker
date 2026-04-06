@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boss Tracker — MuOnline</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #1a1d24;
+    --border: #2a2d36;
+    --accent: #c8a84b;
+    --accent2: #e8c96a;
+    --text: #e8e6e0;
+    --muted: #6b6f7a;
+    --danger: #e05252;
+    --success: #52c878;
+    --warning: #e09652;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 700px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 2.5rem; }
+  .logo {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 6px;
+  }
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin: 16px auto;
+  }
+
+  .boss-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .boss-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 1.5rem;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .boss-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .boss-card.active::before { background: var(--danger); }
+  .boss-card.ready::before { background: var(--success); }
+  .boss-card.active { border-color: #2a1a1a; }
+  .boss-card.ready { border-color: #1a2a1a; }
+
+  .boss-name {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .boss-meta {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 3px;
+  }
+  .boss-meta span { color: var(--accent); }
+
+  .timer-block { text-align: center; }
+  .timer {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .timer.active { color: var(--danger); }
+  .timer.ready { color: var(--success); animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--accent); color: var(--bg); }
+  .btn:active { transform: scale(0.97); }
+  .btn.running {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .btn.running:hover { background: var(--danger); color: #fff; }
+  .btn.spawn {
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .btn.spawn:hover { background: var(--success); color: var(--bg); }
+
+  .started-by {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2rem;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+  }
+  .dot.error { background: var(--danger); }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">Guild Tool</div>
+    <h1>Boss Tracker</h1>
+    <div class="divider"></div>
+    <div class="subtitle">Синхронизированный трекер респауна боссов</div>
+  </header>
+
+  <div id="app">
+    <div class="loading">Загрузка...</div>
+  </div>
+
+  <div class="status-bar">
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">Подключение...</span>
+  </div>
+</div>
+
+<script>
+const BIN_ID = '69d30e0daaba882197ca5cb3';
+const API_KEY = '$2a$10$WcKd4×3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
+const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+const BOSSES = [
+  { id: 'zaikan',   name: 'Zaikan',         hours: 5 },
+  { id: 'darkelf',  name: 'Dark Elf',        hours: 1 },
+  { id: 'tantalos', name: 'Golden Tantalos', hours: 2 },
+];
+
+let state = {};
+let tickInterval = null;
+
+function fmt(ms) {
+  if (ms <= 0) return '00:00:00';
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return [h,m,sec].map(x => String(x).padStart(2,'0')).join(':');
+}
+
+function fmtDateTime(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+}
+
+async function loadState() {
+  try {
+    const r = await fetch(API_URL + '/latest', {
+      headers: { 'X-Master-Key': API_KEY }
+    });
+    const data = await r.json();
+    state = data.record.bosses || {};
+    setStatus(true, 'Синхронизировано');
+  } catch(e) {
+    setStatus(false, 'Ошибка подключения');
+  }
+}
+
+async function saveState() {
+  try {
+    await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': API_KEY
+      },
+      body: JSON.stringify({ bosses: state })
+    });
+    setStatus(true, 'Сохранено — ' + new Date().toLocaleTimeString('ru-RU'));
+  } catch(e) {
+    setStatus(false, 'Ошибка сохранения');
+  }
+}
+
+function setStatus(ok, msg) {
+  document.getElementById('statusDot').className = ok ? 'dot' : 'dot error';
+  document.getElementById('statusText').textContent = msg;
+}
+
+function getCardState(boss) {
+  const s = state[boss.id];
+  if (!s || !s.startedAt) return { status: 'idle', timeLeft: 0 };
+  const elapsed = Date.now() - s.startedAt;
+  const total = boss.hours * 3600 * 1000;
+  const timeLeft = total - elapsed;
+  return {
+    status: timeLeft > 0 ? 'active' : 'ready',
+    timeLeft: Math.max(0, timeLeft),
+    startedAt: s.startedAt,
+    by: s.by || ''
+  };
+}
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '<div class="boss-list">' +
+    BOSSES.map(boss => {
+      const { status, timeLeft, startedAt, by } = getCardState(boss);
+      const timerText = status === 'idle' ? '--:--:--' : status === 'ready' ? 'READY!' : fmt(timeLeft);
+      const timerClass = status === 'idle' ? '' : status;
+      const label = status === 'idle' ? 'ожидание' : status === 'ready' ? 'spawned!' : 'respawn';
+      const btnText = status === 'active' ? 'Сбросить' : 'Убит';
+      const btnClass = 'btn' + (status === 'active' ? ' running' : status === 'ready' ? ' spawn' : '');
+      const startedInfo = startedAt ? `Запущен в ${fmtDateTime(startedAt)}` : '';
+
+      return `
+        <div class="boss-card ${status}" id="card-${boss.id}">
+          <div>
+            <div class="boss-name">${boss.name}</div>
+            <div class="boss-meta">Респаун: <span>${boss.hours}ч</span></div>
+          </div>
+          <div class="timer-block">
+            <div class="timer ${timerClass}" id="timer-${boss.id}">${timerText}</div>
+            <div class="timer-label">${label}</div>
+          </div>
+          <div>
+            <button class="${btnClass}" onclick="toggleBoss('${boss.id}')">${btnText}</button>
+            <div class="started-by" id="by-${boss.id}">${startedInfo}</div>
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+}
+
+async function toggleBoss(id) {
+  const boss = BOSSES.find(b => b.id === id);
+  const { status } = getCardState(boss);
+  if (status === 'active') {
+    delete state[id];
+  } else {
+    state[id] = { startedAt: Date.now() };
+  }
+  render();
+  startTick();
+  await saveState();
+}
+
+function startTick() {
+  if (tickInterval) clearInterval(tickInterval);
+  tickInterval = setInterval(() => {
+    BOSSES.forEach(boss => {
+      const { status, timeLeft } = getCardState(boss);
+      const timerEl = document.getElementById('timer-' + boss.id);
+      const cardEl = document.getElementById('card-' + boss.id);
+      if (!timerEl) return;
+
+      if (status === 'active') {
+        timerEl.textContent = fmt(timeLeft);
+        timerEl.className = 'timer active';
+        cardEl.className = 'boss-card active';
+      } else if (status === 'ready') {
+        timerEl.textContent = 'READY!';
+        timerEl.className = 'timer ready';
+        cardEl.className = 'boss-card ready';
+      }
+    });
+  }, 1000);
+}
+
+async function init() {
+  await loadState();
+  render();
+  startTick();
+  setInterval(async () => {
+    await loadState();
+    render();
+  }, 15000);
+}
+
+init();
+</script>
+</body>
+</html>
