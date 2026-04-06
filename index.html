@@ -6,424 +6,413 @@
 <title>Boss Tracker — MuOnline</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0c10; --surface: #111318; --border: #2a2d36;
-    --accent: #c8a84b; --text: #e8e6e0; --muted: #6b6f7a;
-    --danger: #e05252; --success: #52c878; --warning: #e09652;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; padding: 1.5rem 1rem; }
-  header { text-align: center; margin-bottom: 1.5rem; }
-  .logo { font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
-  h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-  .divider { width: 50px; height: 2px; background: var(--accent); margin: 10px auto; }
-  .server-time { font-family: 'Share Tech Mono', monospace; font-size: 20px; color: var(--accent); letter-spacing: 3px; margin: 4px 0; }
+:root{--bg:#0a0c10;--surface:#111318;--border:#2a2d36;--accent:#c8a84b;--text:#e8e6e0;--muted:#6b6f7a;--danger:#e05252;--success:#52c878;--warning:#e09652;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;padding:1.5rem 1rem;}
+header{text-align:center;margin-bottom:1.5rem;}
+.logo{font-size:11px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.divider{width:50px;height:2px;background:var(--accent);margin:10px auto;}
+.server-time{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--accent);letter-spacing:3px;}
 
-  .layout { display: grid; grid-template-columns: 185px 220px 1fr; gap: 14px; align-items: start; }
+.layout{display:grid;grid-template-columns:185px 210px 1fr;gap:14px;align-items:start;}
 
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px; margin-bottom: 14px; }
-  .panel:last-child { margin-bottom: 0; }
-  .panel-title { font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:14px;}
+.panel:last-child{margin-bottom:0;}
+.ptitle{font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
-  /* EVENTS */
-  .event-item { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .event-item:last-child { border-bottom: none; }
-  .event-name { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .event-timer { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .event-timer.soon { color: var(--warning); }
-  .event-timer.open { color: var(--success); animation: pulse 1s infinite; }
+/* events */
+.ev-item{padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.ev-item:last-child{border-bottom:none;}
+.ev-name{font-size:12px;font-weight:600;text-transform:uppercase;flex:1;}
+.ev-timer{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);white-space:nowrap;}
+.ev-timer.soon{color:var(--warning);}
+.ev-timer.open{color:var(--success);animation:pulse 1s infinite;}
+.notif-btn{background:transparent;border:1px solid var(--border);border-radius:3px;width:20px;height:20px;cursor:pointer;font-size:11px;flex-shrink:0;transition:all 0.15s;color:var(--muted);}
+.notif-btn.on{border-color:var(--accent);color:var(--accent);}
 
-  /* BOSSES */
-  .boss-group { margin-bottom: 10px; }
-  .boss-group:last-child { margin-bottom: 0; }
-  .boss-group-name { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; padding-left: 4px; }
-  .boss-item { padding: 5px 8px; margin-bottom: 3px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color 0.15s; position: relative; overflow: hidden; }
-  .boss-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--border); transition: background 0.3s; }
-  .boss-item.active::before { background: var(--danger); }
-  .boss-item.ready::before { background: var(--success); }
-  .boss-item:hover { border-color: var(--accent); }
-  .boss-item-name { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .boss-item-right { text-align: right; }
-  .boss-item-timer { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); }
-  .boss-item-timer.active { color: var(--danger); }
-  .boss-item-timer.ready { color: var(--success); animation: pulse 1s infinite; }
-  .boss-item-respawn { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+/* bosses */
+.bgroup{margin-bottom:10px;}
+.bgroup:last-child{margin-bottom:0;}
+.bgroup-name{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;padding-left:4px;}
+.bitem{padding:5px 8px;margin-bottom:3px;background:var(--bg);border:1px solid var(--border);border-radius:3px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.15s;}
+.bitem::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border);transition:background 0.3s;}
+.bitem.active::before{background:var(--danger);}
+.bitem.ready::before{background:var(--success);}
+.bitem:hover{border-color:var(--accent);}
+.bitem-name{font-size:12px;font-weight:600;text-transform:uppercase;}
+.bitem-timer{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);}
+.bitem-timer.active{color:var(--danger);}
+.bitem-timer.ready{color:var(--success);animation:pulse 1s infinite;}
+.bitem-sub{font-size:9px;color:var(--muted);}
 
-  /* TABLES */
-  .loc-table { width: 100%; border-collapse: collapse; }
-  .loc-table th { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; padding: 5px 5px; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  .loc-table th.boss-col { text-align: left; }
-  .loc-table td { padding: 4px 5px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .loc-table tr:last-child td { border-bottom: none; }
-  .loc-name { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .loc-respawn { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
-  .loc-cell { text-align: center; }
-  .loc-timer { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer; padding: 3px 4px; border-radius: 3px; border: 1px solid transparent; transition: all 0.15s; display: inline-block; min-width: 52px; }
-  .loc-timer:hover { border-color: var(--accent); color: var(--accent); }
-  .loc-timer.active { color: var(--danger); border-color: #2a1a1a; }
-  .loc-timer.ready { color: var(--success); animation: pulse 1s infinite; }
-  .loc-timer.fixed { color: var(--warning); cursor: default; }
-  .loc-timer.fixed:hover { border-color: transparent; color: var(--warning); }
+/* arena table */
+.arena-table{width:100%;border-collapse:collapse;font-size:11px;}
+.arena-table th{font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;padding:5px 5px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;}
+.arena-table th.name-col{text-align:left;min-width:130px;}
+.arena-table td{padding:3px 5px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.arena-table tr:last-child td{border-bottom:none;}
+.aname{font-size:12px;font-weight:600;text-transform:uppercase;}
+.acell{text-align:center;}
+.atimer{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:3px;border:1px solid transparent;display:inline-block;min-width:50px;transition:all 0.15s;}
+.atimer:hover{border-color:var(--accent);color:var(--accent);}
+.atimer.active{color:var(--danger);border-color:#2a1a1a;}
+.atimer.ready{color:var(--success);animation:pulse 1s infinite;}
+.atimer.none{color:var(--border);cursor:default;}
+.atimer.none:hover{border-color:transparent;color:var(--border);}
+.atimer.fixed{color:var(--warning);cursor:default;}
+.atimer.fixed:hover{border-color:transparent;color:var(--warning);}
 
-  .status-bar { display: flex; align-items: center; gap: 8px; margin-top: 1rem; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
-  .dot.error { background: var(--danger); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.status-bar{display:flex;align-items:center;gap:8px;margin-top:1rem;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+.dot.error{background:var(--danger);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 </style>
 </head>
 <body>
 <div style="max-width:1400px;margin:0 auto;">
-  <header>
-    <div class="logo">Guild Tool</div>
-    <h1>Boss Tracker by Kabal</h1>
-    <div class="divider"></div>
-    <div class="server-time">Server time: <span id="serverTime">--:--:--</span></div>
-  </header>
+<header>
+  <div class="logo">Guild Tool</div>
+  <h1>Boss Tracker by Kabal</h1>
+  <div class="divider"></div>
+  <div class="server-time">Server time: <span id="serverTime">--:--:--</span></div>
+</header>
 
-  <div class="layout">
-    <!-- LEFT: Events + Bosses -->
-    <div>
-      <div class="panel">
-        <div class="panel-title">Events</div>
-        <div id="eventList"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">Bosses</div>
-        <div id="bossList"></div>
-      </div>
-    </div>
-
-    <!-- CENTER: placeholder for future -->
-    <div>
-      <div class="panel" style="min-height:100px;">
-        <div class="panel-title">Kalima</div>
-        <div style="color:var(--muted);font-size:12px;letter-spacing:1px;padding:8px 0;">Coming soon...</div>
-      </div>
-    </div>
-
-    <!-- RIGHT: VIP + Bless tables -->
-    <div>
-      <div class="panel">
-        <div class="panel-title">VIP Arena — Main / Sub1 / Sub2</div>
-        <table class="loc-table">
-          <thead><tr>
-            <th class="boss-col">Boss</th>
-            <th>Main</th><th>Sub1</th><th>Sub2</th>
-          </tr></thead>
-          <tbody id="vipTable"></tbody>
-        </table>
-      </div>
-      <div class="panel">
-        <div class="panel-title">Bless Arena</div>
-        <table class="loc-table">
-          <thead><tr>
-            <th class="boss-col">Boss</th>
-            <th>Bless</th>
-          </tr></thead>
-          <tbody id="blessTable"></tbody>
-        </table>
-      </div>
+<div class="layout">
+  <!-- COL 1: Events -->
+  <div>
+    <div class="panel">
+      <div class="ptitle">Events</div>
+      <div id="eventList"></div>
     </div>
   </div>
 
-  <div class="status-bar">
-    <div class="dot" id="statusDot"></div>
-    <span id="statusText">Подключение...</span>
+  <!-- COL 2: Bosses + Kalima -->
+  <div>
+    <div class="panel">
+      <div class="ptitle">Bosses</div>
+      <div id="bossList"></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Kalima</div>
+      <div style="color:var(--muted);font-size:12px;letter-spacing:1px;padding:4px 0;">Coming soon...</div>
+    </div>
+  </div>
+
+  <!-- COL 3: Arena table (Bless / Main / Sub1 / Sub2) -->
+  <div>
+    <div class="panel">
+      <div class="ptitle">Arena — Bless / Main / Sub1 / Sub2</div>
+      <table class="arena-table">
+        <thead><tr>
+          <th class="name-col">Boss</th>
+          <th>Bless</th>
+          <th>Main</th>
+          <th>Sub1</th>
+          <th>Sub2</th>
+        </tr></thead>
+        <tbody id="arenaTable"></tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<div class="status-bar">
+  <div class="dot" id="statusDot"></div>
+  <span id="statusText">Подключение...</span>
+</div>
+</div>
+
 <script>
-const BIN_ID = '69d30e0daaba882197ca5cb3';
-const API_KEY = '$2a$10$WcKd4x3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
-const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const BIN_ID='69d30e0daaba882197ca5cb3';
+const API_KEY='$2a$10$WcKd4x3jXZjYMOxP1NI0Auul5aZm1mP0VA63W5WAw2pUK3IpfSZz6';
+const API_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-const EVENTS = [
-  { id:'bc',  name:'Blood Castle',    type:'hourly',    minute:25, duration:15 },
-  { id:'cc',  name:'Chaos Castle',    type:'alternate', minute:55, duration:10, parity:'even' },
-  { id:'ds',  name:'Devil Square',    type:'alternate', minute:55, duration:10, parity:'odd'  },
-  { id:'rb',  name:'Rabbits',         type:'hourly',    minute:0,  duration:10 },
-  { id:'ww',  name:'White Wizards',   type:'hourly',    minute:30, duration:10 },
-  { id:'gd',  name:'Golden Dragons',  type:'hourly',    minute:0,  duration:10 },
-  { id:'rd',  name:'Red Dragons',     type:'hourly',    minute:0,  duration:10 },
-  { id:'hh',  name:'Happy Hour',      type:'hourly',    minute:0,  duration:60 },
-  { id:'tdm', name:'Team Deathmatch', type:'hourly',    minute:0,  duration:30 },
+const EVENTS=[
+  {id:'bc', name:'Blood Castle',    type:'hourly',    minute:25,duration:15},
+  {id:'cc', name:'Chaos Castle',    type:'alternate', minute:55,duration:10,parity:'even'},
+  {id:'ds', name:'Devil Square',    type:'alternate', minute:55,duration:10,parity:'odd'},
+  {id:'rb', name:'Rabbits',         type:'hourly',    minute:0, duration:10},
+  {id:'ww', name:'White Wizards',   type:'hourly',    minute:30,duration:10},
+  {id:'gd', name:'Golden Dragons',  type:'hourly',    minute:0, duration:10},
+  {id:'rd', name:'Red Dragons',     type:'hourly',    minute:0, duration:10},
+  {id:'hh', name:'Happy Hour',      type:'hourly',    minute:0, duration:60},
+  {id:'tdm',name:'Team Deathmatch', type:'hourly',    minute:0, duration:30},
 ];
 
-const BOSS_GROUPS = [
-  { name:'Zaikan Tarkan', bosses:[
-    { id:'zt_main', name:'Main', min:300 },
-    { id:'zt_sub1', name:'Sub1', min:300 },
-    { id:'zt_sub2', name:'Sub2', min:300 },
+const BOSS_GROUPS=[
+  {name:'Zaikan Tarkan',bosses:[
+    {id:'zt_main',name:'Main',min:300},
+    {id:'zt_sub1',name:'Sub1',min:300},
+    {id:'zt_sub2',name:'Sub2',min:300},
   ]},
-  { name:'Zaikan Lorencia', bosses:[
-    { id:'zl', name:'Lorencia', min:300 },
+  {name:'Zaikan Lorencia',bosses:[
+    {id:'zl',name:'Lorencia',min:300},
   ]},
-  { name:'Dark Elf', bosses:[
-    { id:'de', name:'Dark Elf', min:60 },
+  {name:'Dark Elf',bosses:[
+    {id:'de',name:'Dark Elf',min:60},
   ]},
-  { name:'Illusion of Kundun', bosses:[
-    { id:'iok1', name:'IK 1', min:120 },
-    { id:'iok2', name:'IK 2', min:300 },
-    { id:'iok3', name:'IK 3', min:480 },
-    { id:'iok4', name:'IK 4', min:480 },
-    { id:'iok5', name:'IK 5', min:600 },
-    { id:'iok6', name:'IK 6', min:780 },
+  {name:'Illusion of Kundun',bosses:[
+    {id:'iok1',name:'IK 1',min:120},
+    {id:'iok2',name:'IK 2',min:300},
+    {id:'iok3',name:'IK 3',min:480},
+    {id:'iok4',name:'IK 4',min:480},
+    {id:'iok5',name:'IK 5',min:600},
+    {id:'iok6',name:'IK 6',min:780},
   ]},
 ];
 
-// VIP Arena — same timing across Main/Sub1/Sub2
-const VIP_BOSSES = [
-  { id:'vip_fp',   name:'Fortune Pouch',       min:30  },
-  { id:'vip_wd',   name:'Witch Doctor',         min:20  },
-  { id:'vip_hh',   name:'Hammerhead',           min:90  },
-  { id:'vip_ik1',  name:'IK 1',                 min:120 },
-  { id:'vip_ik2',  name:'IK 2',                 min:240 },
-  { id:'vip_ik3',  name:'IK 3',                 min:360 },
-  { id:'vip_ik4',  name:'IK 4',                 min:480 },
-  { id:'vip_ik5',  name:'IK 5',                 min:600 },
-  { id:'vip_ik6',  name:'IK 6',                 min:780 },
-  { id:'vip_dk',   name:'Doomed Knight',        min:180 },
-  { id:'vip_sm',   name:'Sword Master',         min:270 },
-  { id:'vip_dp',   name:'Demonic Priest',       min:330 },
-  { id:'vip_cn',   name:'Cursed Necromancer',   min:210 },
-  { id:'vip_qd',   name:'Queen of the Damned',  min:390 },
-  { id:'vip_kc',   name:'Knight Commander',     min:300 },
-  { id:'vip_b1',   name:'Bali 1',               min:60  },
-  { id:'vip_b2',   name:'Bali 2',               min:60  },
-  { id:'vip_b3',   name:'Bali 3',               min:60  },
-  { id:'vip_sl',   name:'Soldier',              min:30  },
-];
-const VIP_LOCS = ['main','sub1','sub2'];
-
-// Bless Arena — different timings + unique bosses
-const BLESS_BOSSES = [
-  { id:'bl_fp',   name:'Fortune Pouch',       min:10  },
-  { id:'bl_wd',   name:'Witch Doctor',         min:20  },
-  { id:'bl_hh',   name:'Hammerhead',           min:90  },
-  { id:'bl_ik1',  name:'IK 1',                 min:120 },
-  { id:'bl_ik2',  name:'IK 2',                 min:240 },
-  { id:'bl_ik3',  name:'IK 3',                 min:360 },
-  { id:'bl_ik4',  name:'IK 4',                 min:480 },
-  { id:'bl_ik5',  name:'IK 5',                 min:600 },
-  { id:'bl_ik6',  name:'IK 6',                 min:720 },
-  { id:'bl_dk',   name:'Doomed Knight',        min:180 },
-  { id:'bl_sm',   name:'Sword Master',         min:270 },
-  { id:'bl_dp',   name:'Demonic Priest',       min:330 },
-  { id:'bl_cn',   name:'Cursed Necromancer',   min:210 },
-  { id:'bl_qd',   name:'Queen of the Damned',  min:390 },
-  { id:'bl_kc',   name:'Knight Commander',     min:300 },
-  { id:'bl_sl',   name:'Soldier',              min:30  },
-  { id:'bl_b1',   name:'Bali 1',               min:60  },
-  { id:'bl_b2',   name:'Bali 2',               min:60  },
-  { id:'bl_b3',   name:'Bali 3',               min:60  },
-  { id:'bl_rh',   name:'Raahu',                min:540 },
-  { id:'bl_ma',   name:'Master Assassin',      min:420 },
-  { id:'bl_an',   name:'Artemis Natas',        min:660 },
-  { id:'bl_de',   name:'Descendant',           min:780 },
-  { id:'bl_edr',  name:'Elite Demon Rider',    min:510 },
-  { id:'bl_ast',  name:'Asteroth',             min:-1  }, // fixed 21:00
-  { id:'bl_dar',  name:'Darion',               min:840 },
-  { id:'bl_sla',  name:'Slaanesh',             min:900 },
-  { id:'bl_ero',  name:'Erohim',               min:1500},
+// Arena bosses: blessMin=null означает нет в Bless, vipMin=null означает нет на VIP
+// fixed:true = фиксированный респаун в fixedHour:00 по серверу
+const ARENA_BOSSES=[
+  {name:'Fortune Pouch',      blessMin:10,  vipMin:30 },
+  {name:'Witch Doctor',       blessMin:20,  vipMin:20 },
+  {name:'Hammerhead',         blessMin:90,  vipMin:90 },
+  {name:'IK 1',               blessMin:120, vipMin:120},
+  {name:'IK 2',               blessMin:240, vipMin:240},
+  {name:'IK 3',               blessMin:360, vipMin:360},
+  {name:'IK 4',               blessMin:480, vipMin:480},
+  {name:'IK 5',               blessMin:600, vipMin:600},
+  {name:'IK 6',               blessMin:720, vipMin:780},
+  {name:'Doomed Knight',      blessMin:180, vipMin:180},
+  {name:'Sword Master',       blessMin:270, vipMin:270},
+  {name:'Demonic Priest',     blessMin:330, vipMin:330},
+  {name:'Cursed Necromancer', blessMin:210, vipMin:210},
+  {name:'Queen of the Damned',blessMin:390, vipMin:390},
+  {name:'Knight Commander',   blessMin:300, vipMin:300},
+  {name:'Bali 1',             blessMin:60,  vipMin:60 },
+  {name:'Bali 2',             blessMin:60,  vipMin:60 },
+  {name:'Bali 3',             blessMin:60,  vipMin:60 },
+  {name:'Soldier',            blessMin:30,  vipMin:30 },
+  {name:'Raahu',              blessMin:540, vipMin:null},
+  {name:'Master Assassin',    blessMin:420, vipMin:null},
+  {name:'Artemis Natas',      blessMin:660, vipMin:null},
+  {name:'Descendant',         blessMin:780, vipMin:null},
+  {name:'Elite Demon Rider',  blessMin:510, vipMin:null},
+  {name:'Asteroth',           blessMin:-1,  vipMin:null, fixed:true, fixedHour:21},
+  {name:'Darion',             blessMin:840, vipMin:null},
+  {name:'Slaanesh',           blessMin:900, vipMin:null},
+  {name:'Erohim',             blessMin:1500,vipMin:null},
 ];
 
-let state = {};
+// Generate IDs from name
+function makeId(name,prefix){return prefix+'_'+name.toLowerCase().replace(/[^a-z0-9]/g,'_');}
 
-function getServerTime() { return new Date(Date.now() + 3*3600000); }
+let state={};
+let bcAlertFired=false;
 
-function fmt(ms) {
-  if (ms <= 0) return '00:00:00';
-  const s = Math.floor(ms/1000);
-  return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60].map(x=>String(x).padStart(2,'0')).join(':');
+function getSrv(){return new Date(Date.now()+3*3600000);}
+
+function fmt(ms){
+  if(ms<=0)return'00:00:00';
+  const s=Math.floor(ms/1000);
+  return[Math.floor(s/3600),Math.floor((s%3600)/60),s%60].map(x=>String(x).padStart(2,'0')).join(':');
 }
-function fmtShort(ms) {
-  if (ms <= 0) return '00:00';
-  const s = Math.floor(ms/1000);
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  return h > 0 ? [h,m,sec].map(x=>String(x).padStart(2,'0')).join(':') : [m,sec].map(x=>String(x).padStart(2,'0')).join(':');
+function fmtS(ms){
+  if(ms<=0)return'00:00';
+  const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  return h>0?[h,m,sec].map(x=>String(x).padStart(2,'0')).join(':'):[m,sec].map(x=>String(x).padStart(2,'0')).join(':');
 }
-function fmtLabel(min) {
-  if (min < 0) return '21:00';
-  if (min >= 60) return (min%60===0 ? (min/60)+'h' : (min/60).toFixed(1)+'h');
+function fmtL(min){
+  if(min<0)return'21:00';
+  if(min>=60)return(min%60===0?(min/60)+'h':(min/60).toFixed(1)+'h');
   return min+'min';
 }
 
-// Fixed time boss (Asteroth 21:00 server)
-function getFixedTimer(hour, minute) {
-  const t = getServerTime();
-  const now = t.getUTCHours()*3600 + t.getUTCMinutes()*60 + t.getUTCSeconds();
-  const target = hour*3600 + (minute||0)*60;
-  let diff = target - now;
-  if (diff <= 0) diff += 86400;
-  return diff * 1000;
+function getFixedMs(h){
+  const t=getSrv();
+  const now=t.getUTCHours()*3600+t.getUTCMinutes()*60+t.getUTCSeconds();
+  let diff=h*3600-now;
+  if(diff<=0)diff+=86400;
+  return diff*1000;
 }
 
-function getNextEvent(ev) {
-  const t = getServerTime();
-  const h=t.getUTCHours(), m=t.getUTCMinutes(), s=t.getUTCSeconds();
-  const nowMs = h*3600000+m*60000+s*1000;
-  let nextH;
-  if (ev.type==='hourly') {
-    nextH = (m<ev.minute||(m===ev.minute&&s===0)) ? h : h+1;
-  } else {
-    const match = ev.parity==='even' ? hh=>hh%2===0 : hh=>hh%2!==0;
-    let c=h; if(!match(c)||m>ev.minute||(m===ev.minute&&s>0)) c++;
-    while(!match(c)) c++; nextH=c;
-  }
-  nextH=nextH%24;
-  let nextMs=nextH*3600000+ev.minute*60000;
-  if(nextMs<=nowMs) nextMs+=86400000;
+function getNextEv(ev){
+  const t=getSrv(),h=t.getUTCHours(),m=t.getUTCMinutes(),s=t.getUTCSeconds();
+  const nowMs=h*3600000+m*60000+s*1000;
+  let nH;
+  if(ev.type==='hourly'){nH=(m<ev.minute||(m===ev.minute&&s===0))?h:h+1;}
+  else{const f=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;let c=h;if(!f(c)||m>ev.minute||(m===ev.minute&&s>0))c++;while(!f(c))c++;nH=c;}
+  nH=nH%24;
+  let nMs=nH*3600000+ev.minute*60000;
+  if(nMs<=nowMs)nMs+=86400000;
   let isOpen=false;
   if(ev.type==='hourly'){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}
-  else{const match=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;if(match(h)){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}}
-  return { msLeft:nextMs-nowMs, isOpen };
+  else{const f=ev.parity==='even'?hh=>hh%2===0:hh=>hh%2!==0;if(f(h)){const st=h*3600000+ev.minute*60000;isOpen=nowMs>=st&&nowMs<st+ev.duration*60000;}}
+  return{msLeft:nMs-nowMs,isOpen};
 }
 
-function getBossState(id, min) {
-  if (min < 0) return { status:'fixed', left: getFixedTimer(21,0) };
-  const s = state[id];
-  if (!s) return { status:'idle', left:0 };
-  const left = min*60000 - (Date.now()-s.startedAt);
-  return { status: left>0?'active':'ready', left: Math.max(0,left) };
+function getBS(id,min){
+  if(min<0)return{status:'fixed',left:getFixedMs(21)};
+  const s=state[id];if(!s)return{status:'idle',left:0};
+  const left=min*60000-(Date.now()-s.startedAt);
+  return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
-function renderEvents() {
-  document.getElementById('eventList').innerHTML = EVENTS.map(ev=>{
-    const {msLeft,isOpen}=getNextEvent(ev);
+function getBCNotif(){return localStorage.getItem('bc_notif')!=='off';}
+function toggleBCNotif(){
+  const on=getBCNotif();localStorage.setItem('bc_notif',on?'off':'on');
+  const b=document.getElementById('bc-notif-btn');
+  if(b){b.className='notif-btn '+(on?'off':'on');}
+}
+
+function playAlert(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.3,0.6].forEach(t=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;o.type='sine';
+      g.gain.setValueAtTime(0.4,ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
+    });
+  }catch(e){}
+}
+
+function renderEvents(){
+  const on=getBCNotif();
+  document.getElementById('eventList').innerHTML=EVENTS.map(ev=>{
+    const{msLeft,isOpen}=getNextEv(ev);
     const soon=msLeft<5*60000&&!isOpen;
     const cls=isOpen?'open':soon?'soon':'';
-    return `<div class="event-item"><div class="event-name">${ev.name}</div><div class="event-timer ${cls}" id="et-${ev.id}">${isOpen?'OPEN':fmt(msLeft)}</div></div>`;
+    const nb=ev.id==='bc'?`<button id="bc-notif-btn" class="notif-btn ${on?'on':'off'}" onclick="toggleBCNotif()" title="Sound alert">&#9836;</button>`:'';
+    return`<div class="ev-item">${nb}<div class="ev-name">${ev.name}</div><div class="ev-timer ${cls}" id="et-${ev.id}">${isOpen?'OPEN':fmt(msLeft)}</div></div>`;
   }).join('');
 }
 
-function renderBosses() {
-  document.getElementById('bossList').innerHTML = BOSS_GROUPS.map(g=>`
-    <div class="boss-group">
-      <div class="boss-group-name">${g.name}</div>
+function renderBosses(){
+  document.getElementById('bossList').innerHTML=BOSS_GROUPS.map(g=>`
+    <div class="bgroup">
+      <div class="bgroup-name">${g.name}</div>
       ${g.bosses.map(b=>{
-        const {status,left}=getBossState(b.id,b.min);
+        const{status,left}=getBS(b.id,b.min);
         const txt=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
-        return `<div class="boss-item ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}',${b.min})">
-          <div class="boss-item-name">${b.name}</div>
-          <div class="boss-item-right">
-            <div class="boss-item-timer ${status==='idle'?'':status}" id="bt-${b.id}">${txt}</div>
-            <div class="boss-item-respawn">${fmtLabel(b.min)}</div>
+        return`<div class="bitem ${status}" id="bi-${b.id}" onclick="toggleBoss('${b.id}',${b.min})">
+          <div class="bitem-name">${b.name}</div>
+          <div style="text-align:right">
+            <div class="bitem-timer ${status==='idle'?'':status}" id="bt-${b.id}">${txt}</div>
+            <div class="bitem-sub">${fmtL(b.min)}</div>
           </div>
         </div>`;
       }).join('')}
     </div>`).join('');
 }
 
-function renderVipTable() {
-  document.getElementById('vipTable').innerHTML = VIP_BOSSES.map(b=>`
-    <tr>
-      <td><div class="loc-name">${b.name}</div><div class="loc-respawn">${fmtLabel(b.min)}</div></td>
-      ${VIP_LOCS.map(loc=>{
-        const key=b.id+'_'+loc;
-        const {status,left}=getBossState(key,b.min);
-        const txt=status==='idle'?'——':status==='ready'?'READY':fmtShort(left);
-        return `<td class="loc-cell"><div class="loc-timer ${status==='idle'?'':status}" id="lt-${key}" onclick="toggleLoc('${key}',${b.min})">${txt}</div></td>`;
-      }).join('')}
-    </tr>`).join('');
-}
-
-function renderBlessTable() {
-  document.getElementById('blessTable').innerHTML = BLESS_BOSSES.map(b=>{
-    const {status,left}=getBossState(b.id,b.min);
-    const isFixed = b.min < 0;
-    const txt = isFixed ? fmt(left) : status==='idle'?'——':status==='ready'?'READY':fmtShort(left);
-    const cls = isFixed ? 'fixed' : (status==='idle'?'':status);
-    const onclick = isFixed ? '' : `onclick="toggleLoc('${b.id}',${b.min})"`;
-    return `<tr>
-      <td><div class="loc-name">${b.name}</div><div class="loc-respawn">${fmtLabel(b.min)}</div></td>
-      <td class="loc-cell"><div class="loc-timer ${cls}" id="lt-${b.id}" ${onclick}>${txt}</div></td>
+function renderArena(){
+  document.getElementById('arenaTable').innerHTML=ARENA_BOSSES.map(b=>{
+    const bid=makeId(b.name,'a');
+    // Bless
+    const bl=getBS(bid+'_bl',b.blessMin);
+    const blTxt=b.blessMin===null?'—':bl.status==='fixed'?fmtS(bl.left):bl.status==='idle'?fmtL(b.blessMin):bl.status==='ready'?'READY':fmtS(bl.left);
+    const blCls=b.blessMin===null?'none':bl.status==='fixed'?'fixed':bl.status==='idle'?'':bl.status;
+    const blClick=b.blessMin!==null&&b.blessMin>=0?`onclick="toggleArena('${bid}_bl',${b.blessMin})"`:'' ;
+    // VIP cols
+    const vipCols=['main','sub1','sub2'].map(loc=>{
+      if(b.vipMin===null)return`<td class="acell"><div class="atimer none">—</div></td>`;
+      const key=bid+'_'+loc;
+      const vs=getBS(key,b.vipMin);
+      const txt=vs.status==='idle'?fmtL(b.vipMin):vs.status==='ready'?'READY':fmtS(vs.left);
+      const cls=vs.status==='idle'?'':vs.status;
+      return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div></td>`;
+    }).join('');
+    return`<tr>
+      <td><div class="aname">${b.name}</div></td>
+      <td class="acell"><div class="atimer ${blCls}" id="lt-${bid}_bl" ${blClick}>${blTxt}</div></td>
+      ${vipCols}
     </tr>`;
   }).join('');
 }
 
-function tickEvents() {
+function tickEvents(){
   EVENTS.forEach(ev=>{
-    const {msLeft,isOpen}=getNextEvent(ev);
-    const el=document.getElementById('et-'+ev.id); if(!el)return;
+    const{msLeft,isOpen}=getNextEv(ev);
+    const el=document.getElementById('et-'+ev.id);if(!el)return;
     const soon=msLeft<5*60000&&!isOpen;
     el.textContent=isOpen?'OPEN':fmt(msLeft);
-    el.className='event-timer'+(isOpen?' open':soon?' soon':'');
+    el.className='ev-timer'+(isOpen?' open':soon?' soon':'');
+    if(ev.id==='bc'&&soon&&!isOpen&&getBCNotif()){if(!bcAlertFired){bcAlertFired=true;playAlert();}}
+    else if(ev.id==='bc'&&!soon){bcAlertFired=false;}
   });
 }
 
-function tickBosses() {
+function tickBosses(){
   BOSS_GROUPS.forEach(g=>g.bosses.forEach(b=>{
-    const {status,left}=getBossState(b.id,b.min);
-    const el=document.getElementById('bt-'+b.id);
-    const card=document.getElementById('bi-'+b.id);
+    const{status,left}=getBS(b.id,b.min);
+    const el=document.getElementById('bt-'+b.id),card=document.getElementById('bi-'+b.id);
     if(!el)return;
     el.textContent=status==='idle'?'--:--:--':status==='ready'?'READY':fmt(left);
-    el.className='boss-item-timer'+(status==='idle'?'':' '+status);
-    card.className='boss-item '+status;
+    el.className='bitem-timer'+(status==='idle'?'':' '+status);
+    card.className='bitem '+status;
   }));
 }
 
-function tickVip() {
-  VIP_BOSSES.forEach(b=>VIP_LOCS.forEach(loc=>{
-    const key=b.id+'_'+loc;
-    const {status,left}=getBossState(key,b.min);
-    const el=document.getElementById('lt-'+key); if(!el)return;
-    el.textContent=status==='idle'?'——':status==='ready'?'READY':fmtShort(left);
-    el.className='loc-timer'+(status==='idle'?'':' '+status);
-  }));
-}
-
-function tickBless() {
-  BLESS_BOSSES.forEach(b=>{
-    const {status,left}=getBossState(b.id,b.min);
-    const el=document.getElementById('lt-'+b.id); if(!el)return;
-    const isFixed=b.min<0;
-    el.textContent=isFixed?fmt(left):(status==='idle'?'——':status==='ready'?'READY':fmtShort(left));
-    el.className='loc-timer'+(isFixed?' fixed':status==='idle'?'':' '+status);
+function tickArena(){
+  ARENA_BOSSES.forEach(b=>{
+    const bid=makeId(b.name,'a');
+    // Bless
+    if(b.blessMin!==null){
+      const el=document.getElementById('lt-'+bid+'_bl');if(!el)return;
+      const s=getBS(bid+'_bl',b.blessMin);
+      const isFixed=b.blessMin<0;
+      el.textContent=isFixed?fmtS(s.left):s.status==='idle'?fmtL(b.blessMin):s.status==='ready'?'READY':fmtS(s.left);
+      el.className='atimer'+(isFixed?' fixed':s.status==='idle'?'':' '+s.status);
+    }
+    // VIP
+    if(b.vipMin!==null){
+      ['main','sub1','sub2'].forEach(loc=>{
+        const key=bid+'_'+loc;
+        const el=document.getElementById('lt-'+key);if(!el)return;
+        const s=getBS(key,b.vipMin);
+        el.textContent=s.status==='idle'?fmtL(b.vipMin):s.status==='ready'?'READY':fmtS(s.left);
+        el.className='atimer'+(s.status==='idle'?'':' '+s.status);
+      });
+    }
   });
 }
 
-async function toggleBoss(id,min) {
-  const {status}=getBossState(id,min);
-  if(status==='active') delete state[id]; else state[id]={startedAt:Date.now()};
-  renderBosses(); await saveState();
+async function toggleBoss(id,min){
+  const{status}=getBS(id,min);
+  if(status==='active')delete state[id];else state[id]={startedAt:Date.now()};
+  renderBosses();await saveState();
 }
-async function toggleLoc(key,min) {
-  if(min<0) return;
-  const {status}=getBossState(key,min);
-  if(status==='active') delete state[key]; else state[key]={startedAt:Date.now()};
-  renderVipTable(); renderBlessTable(); await saveState();
+async function toggleArena(key,min){
+  if(min<0)return;
+  const{status}=getBS(key,min);
+  if(status==='active')delete state[key];else state[key]={startedAt:Date.now()};
+  renderArena();await saveState();
 }
 
-async function loadState() {
-  try {
+async function loadState(){
+  try{
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
-    const d=await r.json(); state=d.record.bosses||{};
+    const d=await r.json();state=d.record.bosses||{};
     setStatus(true,'Синхронизировано');
-  } catch(e){setStatus(false,'Ошибка подключения');}
+  }catch(e){setStatus(false,'Ошибка подключения');}
 }
-async function saveState() {
-  try {
+async function saveState(){
+  try{
     await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify({bosses:state})});
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
-  } catch(e){setStatus(false,'Ошибка сохранения');}
+  }catch(e){setStatus(false,'Ошибка сохранения');}
 }
 function setStatus(ok,msg){
   document.getElementById('statusDot').className=ok?'dot':'dot error';
   document.getElementById('statusText').textContent=msg;
 }
-function updateServerTime(){
-  const t=getServerTime();
+function updateSrvTime(){
+  const t=getSrv();
   document.getElementById('serverTime').textContent=
     [t.getUTCHours(),t.getUTCMinutes(),t.getUTCSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
 }
 
 async function init(){
   await loadState();
-  renderEvents(); renderBosses(); renderVipTable(); renderBlessTable();
-  setInterval(()=>{updateServerTime();tickEvents();tickBosses();tickVip();tickBless();},1000);
+  renderEvents();renderBosses();renderArena();
+  setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();},1000);
   setInterval(async()=>{await loadState();},15000);
 }
-updateServerTime(); init();
+updateSrvTime();init();
 </script>
 </body>
 </html>
