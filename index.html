@@ -70,15 +70,18 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 </style>
 </head>
 <body>
-<div id="modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:9999;">
-  <div style="background:#111318;border:1px solid #c8a84b;border-radius:8px;padding:2rem 2.5rem;text-align:center;max-width:360px;">
-    <div style="font-size:12px;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:10px;">Важный вопрос</div>
-    <div style="font-size:20px;font-weight:700;letter-spacing:1px;color:#e8e6e0;margin-bottom:1.5rem;">Ты скинул зен<br>в гильдбанк?</div>
-    <div style="display:flex;gap:12px;justify-content:center;">
-      <button onclick="modalYes()" style="padding:10px 28px;border:1px solid #52c878;background:transparent;color:#52c878;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:3px;cursor:pointer;">ДА</button>
-      <button onclick="modalNo()" style="padding:10px 28px;border:1px solid #e05252;background:transparent;color:#e05252;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:3px;cursor:pointer;">НЕТ</button>
-    </div>
-    <div id="modal-msg" style="margin-top:1rem;font-size:17px;font-weight:700;color:#e05252;min-height:26px;letter-spacing:1px;"></div>
+<div id="modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:#111318;border:1px solid #c8a84b;border-radius:8px;padding:2rem 2.5rem;text-align:center;max-width:340px;width:90%;">
+    <div style="font-size:12px;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:10px;">Boss Tracker by Kabal</div>
+    <div style="font-size:18px;font-weight:700;color:#e8e6e0;margin-bottom:1.5rem;letter-spacing:1px;">Введи пароль</div>
+    <input id="pass-input" type="password" placeholder="••••••••"
+      style="width:100%;padding:10px 14px;background:#0a0c10;border:1px solid #2a2d36;border-radius:3px;color:#e8e6e0;font-family:'Share Tech Mono',monospace;font-size:16px;letter-spacing:3px;outline:none;margin-bottom:12px;"
+      onkeydown="if(event.key==='Enter')checkPass()">
+    <button onclick="checkPass()"
+      style="width:100%;padding:10px;border:1px solid #c8a84b;background:transparent;color:#c8a84b;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:3px;cursor:pointer;">
+      ВОЙТИ
+    </button>
+    <div id="modal-msg" style="margin-top:12px;font-size:15px;font-weight:700;min-height:22px;letter-spacing:1px;"></div>
   </div>
 </div>
 <div style="max-width:1400px;margin:0 auto;">
@@ -258,14 +261,28 @@ function toggleNotif(id){
   if(b){b.className='notif-btn '+(on?'off':'on');}
 }
 
-function modalYes(){
-  unlockAudio();
-  document.getElementById('modal').style.display='none';
-}
-function modalNo(){
-  unlockAudio();
-  document.getElementById('modal-msg').textContent='Ну ты и мудак 🤦';
-  setTimeout(()=>{ document.getElementById('modal').style.display='none'; }, 2000);
+const MEMBERS=[
+  {password:'kabal21',  name:'Kabal',    greeting:'Привет господин'},
+  {password:'paramon',  name:'Paramon',  greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'problema', name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
+  {password:'junior',   name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
+];
+
+function checkPass(){
+  const val=document.getElementById('pass-input').value.trim();
+  const member=MEMBERS.find(m=>m.password===val);
+  const msg=document.getElementById('modal-msg');
+  if(member){
+    msg.style.color='#52c878';
+    msg.textContent=member.greeting;
+    unlockAudio();
+    setTimeout(()=>{ document.getElementById('modal').style.display='none'; }, 1500);
+  } else {
+    msg.style.color='#e05252';
+    msg.textContent='Доступ запрещён. Иди нахуй.';
+    document.getElementById('pass-input').value='';
+    document.getElementById('pass-input').focus();
+  }
 }
 
 let audioUnlocked=false;
