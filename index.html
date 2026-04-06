@@ -177,6 +177,13 @@
   }
   .dot.error { background: var(--danger); }
 
+  .server-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin: 8px 0 4px;
+  }
   .loading {
     text-align: center;
     padding: 3rem;
@@ -190,8 +197,9 @@
 <div class="container">
   <header>
     <div class="logo">Guild Tool</div>
-    <h1>Boss Tracker</h1>
+    <h1>Boss Tracker by Kabal</h1>
     <div class="divider"></div>
+    <div class="server-time">Server time: <span id="serverTime">--:--:--</span></div>
     <div class="subtitle">Синхронизированный трекер респауна боссов</div>
   </header>
 
@@ -356,6 +364,17 @@ async function init() {
     render();
   }, 15000);
 }
+
+function updateServerTime() {
+  const now = new Date();
+  const utc3 = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+  const h = String(utc3.getUTCHours()).padStart(2,'0');
+  const m = String(utc3.getUTCMinutes()).padStart(2,'0');
+  const s = String(utc3.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('serverTime').textContent = h + ':' + m + ':' + s;
+}
+setInterval(updateServerTime, 1000);
+updateServerTime();
 
 init();
 </script>
