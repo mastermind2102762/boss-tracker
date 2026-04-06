@@ -348,6 +348,8 @@ function toggleNotif(id){
   const on=getNotif(id);localStorage.setItem(id+'_notif',on?'off':'on');
   const b=document.getElementById(id+'-notif-btn');
   if(b){b.className='notif-btn '+(on?'off':'on');}
+  // FP кнопки не имеют id — перерендерим арену
+  if(id.startsWith('fp_'))renderArena();
 }
 
 const MEMBERS=[
@@ -435,7 +437,7 @@ function renderArena(){
     const blTxt=b.blessMin===null?'—':bl.status==='fixed'?fmtS(bl.left):bl.status==='idle'?fmtL(b.blessMin):bl.status==='ready'?'READY':fmtS(bl.left);
     const blCls=b.blessMin===null?'none':bl.status==='fixed'?'fixed':bl.status==='idle'?'':bl.status;
     const blClick=b.blessMin!==null&&b.blessMin>=0?`onclick="toggleArena('${bid}_bl',${b.blessMin})"`:'' ;
-    const blNotif=isFP?`<button class="notif-btn ${getNotif('fp_bl')?'on':'off'}" onclick="event.stopPropagation();toggleNotif('fp_bl')" title="Sound alert" style="margin-left:4px;">&#9836;</button>`:'';
+    const blNotif=isFP?`<button class="notif-btn ${getNotif('fp_bl')?'on':'off'}" onclick="toggleNotif('fp_bl')" title="Sound alert">&#9836;</button>`:'';
     // VIP cols
     const vipCols=['main','sub1','sub2'].map(loc=>{
       if(b.vipMin===null)return`<td class="acell"><div class="atimer none">—</div></td>`;
@@ -443,12 +445,12 @@ function renderArena(){
       const vs=getBS(key,b.vipMin);
       const txt=vs.status==='idle'?fmtL(b.vipMin):vs.status==='ready'?'READY':fmtS(vs.left);
       const cls=vs.status==='idle'?'':vs.status;
-      const fpNotif=isFP?`<button class="notif-btn ${getNotif('fp_'+loc)?'on':'off'}" onclick="event.stopPropagation();toggleNotif('fp_${loc}')" title="Sound alert" style="margin-left:4px;">&#9836;</button>`:'';
-      return`<td class="acell" style="white-space:nowrap;"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${fpNotif}</td>`;
+      const fpNotif=isFP?`<button class="notif-btn ${getNotif('fp_'+loc)?'on':'off'}" onclick="toggleNotif('fp_${loc}')" title="Sound alert">&#9836;</button>`:'';
+      return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleArena('${key}',${b.vipMin})">${txt}</div>${fpNotif}</td>`;
     }).join('');
     return`<tr>
       <td><div class="aname">${b.name}</div></td>
-      <td class="acell" style="white-space:nowrap;"><div class="atimer ${blCls}" id="lt-${bid}_bl" ${blClick}>${blTxt}</div>${blNotif}</td>
+      <td class="acell"><div class="atimer ${blCls}" id="lt-${bid}_bl" ${blClick}>${blTxt}</div>${blNotif}</td>
       ${vipCols}
     </tr>`;
   }).join('');
