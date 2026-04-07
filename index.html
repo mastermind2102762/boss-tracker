@@ -789,8 +789,8 @@ async function init(){
   await loadState();
   renderEvents();renderBosses();renderArena();renderLog();renderFortress();
   setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();},1000);
-  setInterval(async()=>{await loadState();},5000);
-  setInterval(pingOnline, 10000);
+  setInterval(async()=>{await loadState();},30000);
+  setInterval(pingOnline, 60000);
 }
 updateSrvTime();init();
 </script>
