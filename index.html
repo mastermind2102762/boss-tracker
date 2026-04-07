@@ -572,9 +572,11 @@ function tickBosses(){
     card.className='bitem '+status;
     // Звуковой алерт за 3 минуты
     if(BOSS_SOUNDS[b.id]&&status==='active'){
-      if(left<=180000&&left>0&&getNotif('boss_'+b.id)){
+      const gsIds=['gs_main','gs_sub1','gs_sub2','gs_sub3'];
+      const threshold=gsIds.includes(b.id)?60000:180000;
+      if(left<=threshold&&left>0&&getNotif('boss_'+b.id)){
         if(!bossAlertFired[b.id]){bossAlertFired[b.id]=true;playAlert(BOSS_SOUNDS[b.id]);}
-      } else if(left>180000){bossAlertFired[b.id]=false;}
+      } else if(left>threshold){bossAlertFired[b.id]=false;}
     }
   }));
 }
