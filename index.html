@@ -196,6 +196,12 @@ const BOSS_GROUPS=[
   {name:'Cursed King',bosses:[
     {id:'ck',name:'Cursed King',min:15},
   ]},
+  {name:'Armored Goldsmith',bosses:[
+    {id:'gs_main',name:'Main',min:60},
+    {id:'gs_sub1',name:'Sub1',min:60},
+    {id:'gs_sub2',name:'Sub2',min:60},
+    {id:'gs_sub3',name:'Sub3',min:60},
+  ]},
 ];
 
 // Arena bosses: blessMin=null означает нет в Bless, vipMin=null означает нет на VIP
@@ -402,7 +408,7 @@ const MEMBERS=[
   {password:'problema', name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
   {password:'junior',   name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
   {password:'osteo1',   name:'Artem',    greeting:'ШО ТИ, ЛИСИЙ?'},
-  {password:'antoha22',   name:'Anyway',    greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'antoha22', name:'Anyway',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
 ];
 
 function checkPass(){
@@ -548,6 +554,10 @@ const BOSS_SOUNDS={
   'zl':      'zaikanlor.mp3',
   'de':      'darkelf.mp3',
   'ck':      'cursedk.mp3',
+  'gs_main': 'gsmain.mp3',
+  'gs_sub1': 'gss1.mp3',
+  'gs_sub2': 'gss2.mp3',
+  'gs_sub3': 'gss3.mp3',
 };
 const bossAlertFired={};
 Object.keys(BOSS_SOUNDS).forEach(id=>bossAlertFired[id]=false);
