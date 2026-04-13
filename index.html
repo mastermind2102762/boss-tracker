@@ -362,6 +362,8 @@ function getBS(id,min){
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
+function getNotif(id){return localStorage.getItem(id+'_notif')!=='off';}
+
 const KALIMA=[
   {id:'k1', name:'Kalima 1', min:120},
   {id:'k2', name:'Kalima 2', min:300},
