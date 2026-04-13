@@ -15,7 +15,7 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 .divider{width:50px;height:2px;background:var(--accent);margin:10px auto;}
 .server-time{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--accent);letter-spacing:3px;}
 
-.layout{display:grid;grid-template-columns:185px 210px 280px 1fr;gap:14px;align-items:start;}
+.layout{display:grid;grid-template-columns:185px 210px 1fr 1fr;gap:14px;align-items:start;}
 
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:14px;}
 .panel:last-child{margin-bottom:0;}
@@ -128,10 +128,10 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
   <div>
     <div class="panel">
       <div class="ptitle">Kalima — Kundun</div>
-      <table class="arena-table" id="kalimaTable">
+      <table class="arena-table" id="kalimaTable" style="font-size:10px;">
         <thead><tr>
-          <th class="name-col">Kalima</th>
-          <th>Main</th><th>Sub1</th><th>Sub2</th><th>Sub3</th>
+          <th class="name-col" style="font-size:9px;">Kalima</th>
+          <th style="font-size:9px;">Main</th><th style="font-size:9px;">Sub1</th><th style="font-size:9px;">Sub2</th><th style="font-size:9px;">Sub3</th>
         </tr></thead>
         <tbody id="kalimaBody"></tbody>
       </table>
@@ -201,10 +201,8 @@ const BOSS_GROUPS=[
     {id:'de',name:'Dark Elf',min:60},
     {id:'lava',name:'Lava Demon',min:600},
   ]},
-  {name:'Ancient Lord C',bosses:[
+  {name:'Snowstorm Davias',bosses:[
     {id:'alc',name:'Ancient Lord C',min:180},
-  ]},
-  {name:'Cursed King',bosses:[
     {id:'ck',name:'Cursed King',min:15},
   ]},
   {name:'Armored Goldsmith',bosses:[
@@ -389,7 +387,7 @@ function renderKalima(){
       const cls=s.status==='idle'?'':s.status;
       return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleKalima('${key}',${k.min})">${txt}</div></td>`;
     }).join('');
-    return`<tr><td><div class="aname">${k.name}</div><div class="loc-respawn">${fmtL(k.min)}</div></td>${cols}</tr>`;
+    return`<tr><td><div class="aname" style="font-size:11px;">${k.name}</div></td>${cols}</tr>`;
   }).join('');
 }
 
