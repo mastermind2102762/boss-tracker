@@ -812,6 +812,8 @@ let isSaving=false;
 
 async function loadState(){
   if(isSaving)return;
+async function loadState(){
+  if(isSaving)return;
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
@@ -823,7 +825,15 @@ async function loadState(){
       serverTimeOffset=serverTs+latency-fetchEnd;
     }
     const d=await r.json();
-    state=d.record.bosses||{};
+    const serverBosses=d.record.bosses||{};
+    // Мёрджим: если локальный таймер новее серверного — оставляем локальный
+    const merged={...serverBosses};
+    Object.keys(state).forEach(k=>{
+      if(!serverBosses[k]||(state[k].startedAt>=(serverBosses[k]?.startedAt||0))){
+        merged[k]=state[k];
+      }
+    });
+    state=merged;
     const newLog=d.record.log||[];
     if(JSON.stringify(newLog)!==JSON.stringify(activityLog)){
       activityLog=newLog;renderLog();
