@@ -123,8 +123,14 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
       <div id="bossList"></div>
     </div>
     <div class="panel">
-      <div class="ptitle">Kalima</div>
-      <div style="color:var(--muted);font-size:12px;letter-spacing:1px;padding:4px 0;">Coming soon...</div>
+      <div class="ptitle">Kalima — Kundun</div>
+      <table class="arena-table" id="kalimaTable">
+        <thead><tr>
+          <th class="name-col">Kalima</th>
+          <th>Main</th><th>Sub1</th><th>Sub2</th><th>Sub3</th>
+        </tr></thead>
+        <tbody id="kalimaBody"></tbody>
+      </table>
     </div>
   </div>
 
@@ -187,8 +193,9 @@ const BOSS_GROUPS=[
   {name:'Zaikan Lorencia',bosses:[
     {id:'zl',name:'Lorencia',min:300},
   ]},
-  {name:'Dark Elf',bosses:[
+  {name:'Balgass Refuge',bosses:[
     {id:'de',name:'Dark Elf',min:60},
+    {id:'lava',name:'Lava Demon',min:600},
   ]},
   {name:'Ancient Lord C',bosses:[
     {id:'alc',name:'Ancient Lord C',min:180},
@@ -355,7 +362,51 @@ function getBS(id,min){
   return{status:left>0?'active':'ready',left:Math.max(0,left)};
 }
 
-function getNotif(id){return localStorage.getItem(id+'_notif')!=='off';}
+const KALIMA=[
+  {id:'k1', name:'Kalima 1', min:120},
+  {id:'k2', name:'Kalima 2', min:300},
+  {id:'k3', name:'Kalima 3', min:480},
+  {id:'k4', name:'Kalima 4', min:480},
+  {id:'k5', name:'Kalima 5', min:600},
+  {id:'k6', name:'Kalima 6', min:780},
+  {id:'k7', name:'Kalima 7', min:1500},
+];
+const KALIMA_LOCS=['main','sub1','sub2','sub3'];
+
+function renderKalima(){
+  const tbody=document.getElementById('kalimaBody');if(!tbody)return;
+  tbody.innerHTML=KALIMA.map(k=>{
+    const cols=KALIMA_LOCS.map(loc=>{
+      const key='kal_'+k.id+'_'+loc;
+      const s=getBS(key,k.min);
+      const txt=s.status==='idle'?fmtL(k.min):s.status==='ready'?'READY':fmtS(s.left);
+      const cls=s.status==='idle'?'':s.status;
+      return`<td class="acell"><div class="atimer ${cls}" id="lt-${key}" onclick="toggleKalima('${key}',${k.min})">${txt}</div></td>`;
+    }).join('');
+    return`<tr><td><div class="aname">${k.name}</div><div class="loc-respawn">${fmtL(k.min)}</div></td>${cols}</tr>`;
+  }).join('');
+}
+
+function tickKalima(){
+  KALIMA.forEach(k=>{
+    KALIMA_LOCS.forEach(loc=>{
+      const key='kal_'+k.id+'_'+loc;
+      const el=document.getElementById('lt-'+key);if(!el)return;
+      const s=getBS(key,k.min);
+      el.textContent=s.status==='idle'?fmtL(k.min):s.status==='ready'?'READY':fmtS(s.left);
+      el.className='atimer'+(s.status==='idle'?'':' '+s.status);
+    });
+  });
+}
+
+async function toggleKalima(key,min){
+  const s=getBS(key,min);
+  if(s.status==='active'){if(!confirm('Сбросить таймер?'))return;}
+  const action=s.status==='active'?'сбросил':'запустил';
+  if(s.status==='active')delete state[key];else state[key]={startedAt:now()};
+  addLog(`${currentUser} — ${action} таймер: Kalima / ${key}`);
+  renderKalima();await saveState();
+}
 
 const FORTRESS=[
   {id:'kd_morning', name:'Kanturu Domination', sub:'Morning',  hour:14, minute:30},
@@ -798,8 +849,8 @@ function updateSrvTime(){
 
 async function init(){
   await loadState();
-  renderEvents();renderBosses();renderArena();renderLog();renderFortress();
-  setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();},1000);
+  renderEvents();renderBosses();renderArena();renderLog();renderFortress();renderKalima();
+  setInterval(()=>{updateSrvTime();tickEvents();tickBosses();tickArena();tickFortress();tickKalima();},1000);
   setInterval(async()=>{await loadState();},30000);
   setInterval(pingOnline, 60000);
 }
