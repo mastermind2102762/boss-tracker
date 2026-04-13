@@ -809,9 +809,11 @@ async function pingOnline(){
 }
 
 let isSaving=false;
+let lastSaveTime=0;
 
 async function loadState(){
   if(isSaving)return;
+  if(Date.now()-lastSaveTime<5000)return; // не грузим 5 сек после сохранения
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
@@ -823,15 +825,7 @@ async function loadState(){
       serverTimeOffset=serverTs+latency-fetchEnd;
     }
     const d=await r.json();
-    const serverBosses=d.record.bosses||{};
-    // Мёрджим: если локальный таймер новее серверного — оставляем локальный
-    const merged={...serverBosses};
-    Object.keys(state).forEach(k=>{
-      if(!serverBosses[k]||(state[k].startedAt>=(serverBosses[k]?.startedAt||0))){
-        merged[k]=state[k];
-      }
-    });
-    state=merged;
+    state=d.record.bosses||{};
     const newLog=d.record.log||[];
     if(JSON.stringify(newLog)!==JSON.stringify(activityLog)){
       activityLog=newLog;renderLog();
@@ -841,8 +835,10 @@ async function loadState(){
     setStatus(true,'Синхронизировано');
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
+
 async function saveState(){
   isSaving=true;
+  lastSaveTime=Date.now();
   try{
     await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
       body:JSON.stringify({bosses:state,log:activityLog,online:onlineUsers})});
