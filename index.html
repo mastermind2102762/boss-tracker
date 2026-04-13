@@ -253,6 +253,7 @@ const ARENA_BOSSES=[
 function makeId(name,prefix){return prefix+'_'+name.toLowerCase().replace(/[^a-z0-9]/g,'_');}
 
 let state={};
+let onlineUsers={};
 let serverTimeOffset=0; // разница между временем сервера и локальным
 
 function now(){return Date.now()+serverTimeOffset;}
@@ -801,15 +802,9 @@ function renderOnline(onlineUsers){
 async function pingOnline(){
   if(currentUser==='Unknown')return;
   try{
-    const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
-    const d=await r.json();
-    const online=d.record.online||{};
-    online[currentUser]=Date.now();
-    // Чистим старых (>30 сек)
-    Object.keys(online).forEach(k=>{if(Date.now()-online[k]>30000)delete online[k];});
-    renderOnline(online);
-    await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-      body:JSON.stringify({bosses:state,log:activityLog,online})});
+    onlineUsers[currentUser]=Date.now();
+    Object.keys(onlineUsers).forEach(k=>{if(Date.now()-onlineUsers[k]>60000)delete onlineUsers[k];});
+    renderOnline(onlineUsers);
   }catch(e){}
 }
 
@@ -834,17 +829,15 @@ async function loadState(){
       activityLog=newLog;renderLog();
     }
     renderOnline(d.record.online||{});
+    onlineUsers=d.record.online||{};
     setStatus(true,'Синхронизировано');
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
 async function saveState(){
   isSaving=true;
   try{
-    const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
-    const d=await r.json();
-    const online=d.record.online||{};
     await fetch(API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-      body:JSON.stringify({bosses:state,log:activityLog,online})});
+      body:JSON.stringify({bosses:state,log:activityLog,online:onlineUsers})});
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
   }catch(e){setStatus(false,'Ошибка сохранения');}
   finally{isSaving=false;}
