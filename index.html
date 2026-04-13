@@ -810,7 +810,10 @@ async function pingOnline(){
   }catch(e){}
 }
 
+let isSaving=false;
+
 async function loadState(){
+  if(isSaving)return;
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
@@ -832,6 +835,7 @@ async function loadState(){
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
 async function saveState(){
+  isSaving=true;
   try{
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
     const d=await r.json();
@@ -840,6 +844,7 @@ async function saveState(){
       body:JSON.stringify({bosses:state,log:activityLog,online})});
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
   }catch(e){setStatus(false,'Ошибка сохранения');}
+  finally{isSaving=false;}
 }
 function setStatus(ok,msg){
   document.getElementById('statusDot').className=ok?'dot':'dot error';
