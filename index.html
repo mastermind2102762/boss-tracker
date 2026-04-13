@@ -812,8 +812,6 @@ let isSaving=false;
 
 async function loadState(){
   if(isSaving)return;
-async function loadState(){
-  if(isSaving)return;
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
