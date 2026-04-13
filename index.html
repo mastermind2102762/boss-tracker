@@ -810,10 +810,11 @@ async function pingOnline(){
 
 let isSaving=false;
 let lastSaveTime=0;
+let saveTimer=null;
 
 async function loadState(){
   if(isSaving)return;
-  if(Date.now()-lastSaveTime<5000)return; // не грузим 5 сек после сохранения
+  if(Date.now()-lastSaveTime<8000)return;
   try{
     const fetchStart=Date.now();
     const r=await fetch(API_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
@@ -836,7 +837,7 @@ async function loadState(){
   }catch(e){setStatus(false,'Ошибка подключения');}
 }
 
-async function saveState(){
+async function doSave(){
   isSaving=true;
   lastSaveTime=Date.now();
   try{
@@ -845,6 +846,12 @@ async function saveState(){
     setStatus(true,'Сохранено — '+new Date().toLocaleTimeString('ru-RU'));
   }catch(e){setStatus(false,'Ошибка сохранения');}
   finally{isSaving=false;}
+}
+
+async function saveState(){
+  // Debounce — ждём 600мс после последнего нажатия, потом один общий save
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(doSave, 600);
 }
 function setStatus(ok,msg){
   document.getElementById('statusDot').className=ok?'dot':'dot error';
