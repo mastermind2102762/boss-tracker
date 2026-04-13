@@ -15,7 +15,7 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 .divider{width:50px;height:2px;background:var(--accent);margin:10px auto;}
 .server-time{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--accent);letter-spacing:3px;}
 
-.layout{display:grid;grid-template-columns:185px 210px minmax(280px,350px) 1fr;gap:14px;align-items:start;}
+.layout{display:grid;grid-template-columns:185px 210px 340px 1fr;gap:14px;align-items:start;}
 
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:14px;}
 .panel:last-child{margin-bottom:0;}
@@ -128,10 +128,13 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
   <div>
     <div class="panel">
       <div class="ptitle">Kalima — Kundun</div>
-      <table class="arena-table" id="kalimaTable" style="font-size:10px;">
+      <table class="arena-table" id="kalimaTable" style="font-size:10px;table-layout:fixed;width:100%;">
         <thead><tr>
-          <th class="name-col" style="font-size:9px;">Kalima</th>
-          <th style="font-size:9px;">Main</th><th style="font-size:9px;">Sub1</th><th style="font-size:9px;">Sub2</th><th style="font-size:9px;">Sub3</th>
+          <th class="name-col" style="font-size:9px;width:80px;">Kalima</th>
+          <th style="font-size:9px;width:60px;">Main</th>
+          <th style="font-size:9px;width:60px;">Sub1</th>
+          <th style="font-size:9px;width:60px;">Sub2</th>
+          <th style="font-size:9px;width:60px;">Sub3</th>
         </tr></thead>
         <tbody id="kalimaBody"></tbody>
       </table>
