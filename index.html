@@ -166,7 +166,7 @@ const EVENTS=[
   {id:'bc',  name:'Blood Castle',    type:'hourly',    minute:25, duration:5},
   {id:'cc',  name:'Chaos Castle',    type:'alternate', minute:55, duration:5, parity:'even'},
   {id:'ds',  name:'Devil Square',    type:'alternate', minute:55, duration:5, parity:'odd'},
-  {id:'rb',  name:'White Rabbits',   type:'fixed',     hour:13,   minute:47, duration:10, aliveLabel:'ALIVE',  aliveDuration:10},
+  {id:'rb',  name:'White Rabbits',   type:'fixed',     hour:19,   minute:47, duration:10, aliveLabel:'ALIVE',  aliveDuration:10},
   {id:'col', name:'Colloseum',       type:'fixed',     hour:9,    minute:20, duration:10},
   {id:'rd',  name:'Red Dragon',      type:'fixedloop', hour:9,    minute:10, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
   {id:'gd',  name:'Golden Dragon',   type:'fixedloop', hour:9,    minute:15, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
@@ -175,7 +175,7 @@ const EVENTS=[
   {id:'cd',  name:'Castle Deep',     type:'fixed',     hour:16,   minute:0,  duration:10},
   {id:'tdm', name:'Team Deathmatch', type:'multifixed', times:[{hour:14,minute:0},{hour:20,minute:0}], duration:10, aliveLabel:'BATTLE', aliveDuration:10},
   {id:'hh',  name:'Happy Hour',      type:'hourly',    minute:0,  duration:60},
-  {id:'ww',  name:'White Wizards',   type:'hourly',    minute:30, duration:10},
+  {id:'ww',  name:'White Wizards',   type:'alternate', minute:47, duration:10, parity:'even'},
 ];
 
 const BOSS_GROUPS=[
@@ -403,17 +403,17 @@ function toggleNotif(id){
 }
 
 const MEMBERS=[
-  {password:'kabal21',  name:'Kabal',    greeting:'Привет господин'},
-  {password:'paramon',  name:'Paramon',  greeting:'ЗДАРОВА ЗАЕБАЛ'},
-  {password:'problema', name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
-  {password:'junior',   name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
-  {password:'osteo1',   name:'Artem',    greeting:'ШО ТИ, ЛИСИЙ?'},
-  {password:'antoha22', name:'Anyway',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
-  {password:'stas123', name:'Hyperion',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
-  {password:'fatality', name:'bigjoe',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'kabal21',   name:'Kabal',    greeting:'Привет господин'},
+  {password:'paramon',   name:'Paramon',  greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'problema',  name:'Problema', greeting:'ЛАБРИТ ЕБАТЬ'},
+  {password:'junior',    name:'Roland',   greeting:'ПЕРЕЗАГРУЗИ РОУТЕР'},
+  {password:'osteo1',    name:'Artem',    greeting:'ШО ТИ, ЛИСИЙ?'},
+  {password:'antoha22',  name:'Anyway',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'stas123',   name:'Hyperion', greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'fatality',  name:'bigjoe',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
   {password:'zloika111', name:'zloika',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
-  {password:'brUtalitY', name:'tratata',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
-  {password:'ebukowki', name:'CINEMA',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'brUtalitY', name:'tratata',  greeting:'ЗДАРОВА ЗАЕБАЛ'},
+  {password:'ebukowki',  name:'CINEMA',   greeting:'ЗДАРОВА ЗАЕБАЛ'},
 ];
 
 function checkPass(){
@@ -693,6 +693,9 @@ function tickArena(){
 
 async function toggleBoss(id,min){
   const{status}=getBS(id,min);
+  if(status==='active'){
+    if(!confirm('Сбросить таймер?')) return;
+  }
   const action=status==='active'?'сбросил':'запустил';
   const bossName=BOSS_GROUPS.flatMap(g=>g.bosses).find(b=>b.id===id)?.name||id;
   if(status==='active')delete state[id];else state[id]={startedAt:now()};
@@ -702,6 +705,9 @@ async function toggleBoss(id,min){
 async function toggleArena(key,min){
   if(min<0)return;
   const{status}=getBS(key,min);
+  if(status==='active'){
+    if(!confirm('Сбросить таймер?')) return;
+  }
   const action=status==='active'?'сбросил':'запустил';
   const parts=key.split('_');
   const bossName=ARENA_BOSSES.find(b=>makeId(b.name,'a')===parts.slice(0,-1).join('_'))?.name||key;
