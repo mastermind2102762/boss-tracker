@@ -15,7 +15,7 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 .divider{width:50px;height:2px;background:var(--accent);margin:10px auto;}
 .server-time{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--accent);letter-spacing:3px;}
 
-.layout{display:grid;grid-template-columns:185px 210px 1fr;gap:14px;align-items:start;}
+.layout{display:grid;grid-template-columns:185px 210px 280px 1fr;gap:14px;align-items:start;}
 
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:14px;}
 .panel:last-child{margin-bottom:0;}
@@ -116,12 +116,16 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
     </div>
   </div>
 
-  <!-- COL 2: Bosses + Kalima -->
+  <!-- COL 2: Bosses -->
   <div>
     <div class="panel">
       <div class="ptitle">Bosses</div>
       <div id="bossList"></div>
     </div>
+  </div>
+
+  <!-- COL 3: Kalima -->
+  <div>
     <div class="panel">
       <div class="ptitle">Kalima — Kundun</div>
       <table class="arena-table" id="kalimaTable">
@@ -134,7 +138,7 @@ h1{font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
     </div>
   </div>
 
-  <!-- COL 3: Arena table (Bless / Main / Sub1 / Sub2) -->
+  <!-- COL 4: Arena table (Bless / VIP) -->
   <div>
     <div class="panel">
       <div class="ptitle">Arena — Bless Arena / VIP15 Main / VIP15 Sub1 / VIP15 Sub2</div>
@@ -177,7 +181,7 @@ const EVENTS=[
   {id:'rd',  name:'Red Dragon',      type:'fixedloop', hour:9,    minute:10, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
   {id:'gd',  name:'Golden Dragon',   type:'fixedloop', hour:9,    minute:15, intervalH:2, duration:10, aliveLabel:'ALIVE', aliveDuration:5},
   {id:'mt',  name:'Magic Treasure',  type:'fixedloop', hour:9,    minute:20, intervalH:2, duration:10},
-  {id:'dk',  name:'Death King',      type:'fixed',     hour:8,    minute:50, duration:10},
+  {id:'dk',  name:'Death King',      type:'fixedloop', hour:20,   minute:50, intervalH:4, duration:10},
   {id:'cd',  name:'Castle Deep',     type:'fixed',     hour:16,   minute:0,  duration:10},
   {id:'tdm', name:'Team Deathmatch', type:'multifixed', times:[{hour:14,minute:0},{hour:20,minute:0}], duration:10, aliveLabel:'BATTLE', aliveDuration:10},
   {id:'hh',  name:'Happy Hour',      type:'hourly',    minute:0,  duration:60},
